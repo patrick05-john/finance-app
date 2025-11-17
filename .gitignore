@@ -1,0 +1,9 @@
+# .gitignore
+venv/
+__pycache__/
+*.pyc
+.env
+.migrations/
+instance/
+node_modules/
+.DS_Store

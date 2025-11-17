@@ -1,0 +1,10 @@
+Flask==2.3.*
+Flask-WTF
+Flask-Mail
+Flask-SQLAlchemy
+mysql-connector-python        # OR pymysql / mysqlclient
+Flask-Migrate
+pandas
+numpy
+python-dotenv
+Werkzeug
