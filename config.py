@@ -24,13 +24,6 @@ class Config:
     # Use PostgreSQL if available, otherwise fallback to SQLite
     SQLALCHEMY_DATABASE_URI = database_url or f"sqlite:///{BASE_DIR / 'finance.db'}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # For PostgreSQL connection pool settings (optional but recommended)
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_size': 10,
-        'pool_recycle': 300,
-        'pool_pre_ping': True
-    }
 
     # EMAIL SETTINGS
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
