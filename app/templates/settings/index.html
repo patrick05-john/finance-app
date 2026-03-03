@@ -1,0 +1,156 @@
+﻿{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-dark fw-bold" style="color: #0d2342 !important;">Settings</h2>
+            <p class="text-muted">Manage your account preferences and details.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-2">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <button class="nav-link active text-start py-3 px-4 rounded-3 mb-1" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="true">
+                            <i class="bi bi-person-circle me-2"></i> Profile
+                        </button>
+                        <button class="nav-link text-start py-3 px-4 rounded-3 mb-1" id="v-pills-password-tab" data-bs-toggle="pill" data-bs-target="#v-pills-password" type="button" role="tab" aria-controls="v-pills-password" aria-selected="false">
+                            <i class="bi bi-shield-lock me-2"></i> Security
+                        </button>
+                        <button class="nav-link text-start py-3 px-4 rounded-3 mb-1" id="v-pills-preferences-tab" data-bs-toggle="pill" data-bs-target="#v-pills-preferences" type="button" role="tab" aria-controls="v-pills-preferences" aria-selected="false">
+                            <i class="bi bi-sliders me-2"></i> Preferences
+                        </button>
+                        <button class="nav-link text-danger text-start py-3 px-4 rounded-3" id="v-pills-danger-tab" data-bs-toggle="pill" data-bs-target="#v-pills-danger" type="button" role="tab" aria-controls="v-pills-danger" aria-selected="false">
+                            <i class="bi bi-exclamation-triangle me-2"></i> Danger Zone
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 p-md-5">
+                    <div class="tab-content" id="v-pills-tabContent">
+                        
+                        <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                            <h4 class="mb-4 fw-bold text-dark">Profile Information</h4>
+                            <form method="POST" action="{{ url_for('settings.index') }}">
+                                {{ profile_form.hidden_tag() }}
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small">FULL NAME</label>
+                                    {{ profile_form.name(class="form-control form-control-lg border-light-subtle bg-light") }}
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small">EMAIL ADDRESS</label>
+                                    {{ profile_form.email(class="form-control form-control-lg border-light-subtle bg-light") }}
+                                </div>
+                                <button type="submit" name="update_profile" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm" style="background-color: #0d2342; border: none;">Save Changes</button>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="v-pills-password" role="tabpanel" aria-labelledby="v-pills-password-tab">
+                            <h4 class="mb-4 fw-bold text-dark">Change Password</h4>
+                            <form method="POST" action="{{ url_for('settings.index') }}">
+                                {{ password_form.hidden_tag() }}
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small">CURRENT PASSWORD</label>
+                                    {{ password_form.current_password(class="form-control form-control-lg border-light-subtle bg-light") }}
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small">NEW PASSWORD</label>
+                                    {{ password_form.new_password(class="form-control form-control-lg border-light-subtle bg-light") }}
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small">CONFIRM NEW PASSWORD</label>
+                                    {{ password_form.confirm_password(class="form-control form-control-lg border-light-subtle bg-light") }}
+                                </div>
+                                <button type="submit" name="change_password" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm" style="background-color: #0d2342; border: none;">Update Password</button>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="v-pills-preferences" role="tabpanel" aria-labelledby="v-pills-preferences-tab">
+                            <h4 class="mb-4 fw-bold text-dark">App Preferences</h4>
+                            <form method="POST" action="{{ url_for('settings.index') }}">
+                                {{ preferences_form.hidden_tag() }}
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <label class="form-label text-muted fw-semibold small">CURRENCY</label>
+                                        {{ preferences_form.currency(class="form-select form-select-lg border-light-subtle bg-light") }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted fw-semibold small">TIMEZONE</label>
+                                        {{ preferences_form.timezone(class="form-select form-select-lg border-light-subtle bg-light") }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small mb-3 d-block">NOTIFICATIONS</label>
+                                    <div class="form-check form-switch mb-3">
+                                        {{ preferences_form.notify_email(class="form-check-input fs-5", role="switch") }}
+                                        <label class="form-check-label pt-1 ms-2" for="notify_email">Receive Email Notifications</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        {{ preferences_form.notify_push(class="form-check-input fs-5", role="switch", disabled=true) }}
+                                        <label class="form-check-label pt-1 ms-2 text-muted" for="notify_push">Push Notifications <span class="badge bg-secondary ms-1">Coming Soon</span></label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" name="save_preferences" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm" style="background-color: #0d2342; border: none;">Save Preferences</button>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="v-pills-danger" role="tabpanel" aria-labelledby="v-pills-danger-tab">
+                            <h4 class="mb-3 fw-bold text-danger">Delete Account</h4>
+                            <div class="alert alert-danger border-0 rounded-3 mb-4" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <strong>Warning:</strong> Deleting your account is permanent. All your financial data, history, and preferences will be erased.
+                            </div>
+                            <form method="POST" action="{{ url_for('settings.index') }}">
+                                {{ delete_form.hidden_tag() }}
+                                <div class="mb-4">
+                                    <label class="form-label text-muted fw-semibold small">VERIFY PASSWORD TO CONTINUE</label>
+                                    {{ delete_form.password(class="form-control form-control-lg border-danger-subtle", placeholder="Enter your password") }}
+                                </div>
+                                <button type="submit" name="delete_account" class="btn btn-danger btn-lg px-4 rounded-pill shadow-sm">Permanently Delete Account</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: #495057;
+        transition: all 0.2s ease-in-out;
+    }
+    .nav-pills .nav-link:hover {
+        background-color: #f8f9fa;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #e9ecef !important;
+        color: #0d2342 !important;
+        font-weight: 600;
+    }
+    .nav-pills .nav-link.text-danger.active {
+        background-color: #f8d7da !important;
+        color: #dc3545 !important;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0d2342;
+        box-shadow: 0 0 0 0.25rem rgba(13, 35, 66, 0.25);
+    }
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,126 @@
+﻿{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0 fw-bold" style="color: var(--text-primary, #111827);">Financial Reports & Analytics</h3>
+        <a href="/reports/export" class="btn btn-success"><i class="fas fa-download me-2"></i>Download CSV</a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 p-3" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-3">Monthly Summary</h5>
+                <canvas id="monthlyChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card shadow-sm border-0 p-3 h-100" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-3">Category Spending</h5>
+                <canvas id="categoryChart" style="max-height: 250px;"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 p-4 h-100" style="border-radius: 12px; border-top: 4px solid #F59E0B !important;">
+                <h5 class="fw-bold text-muted text-uppercase small mb-2">Next Month's Forecast</h5>
+                <div id="forecastValue" class="display-6 fw-bold mb-4" style="color: #111827;">Loading...</div>
+                
+                <h6 class="text-muted text-uppercase small fw-bold border-bottom pb-2 mb-3">Forecast Breakdown</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-0 bg-transparent">
+                        <div>
+                            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background-color: #F59E0B;"></span>
+                            Scheduled Bills (Fixed)
+                        </div>
+                        <span id="forecastFixed" class="fw-semibold text-dark">...</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-0 bg-transparent">
+                        <div>
+                            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background-color: #3B82F6;"></span>
+                            Predicted Daily Spend (Variable)
+                        </div>
+                        <span id="forecastVariable" class="fw-semibold text-dark">...</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+async function loadReports() {
+    try {
+        let summary = await fetch("/reports/summary").then(r => r.json());
+        let categories = await fetch("/reports/categories").then(r => r.json());
+        let forecast = await fetch("/reports/forecast").then(r => r.json());
+
+        // Monthly Chart
+        if (summary.status !== 'empty') {
+            new Chart(document.getElementById("monthlyChart"), {
+                type: "line",
+                data: {
+                    labels: Object.keys(summary.monthly),
+                    datasets: [{
+                        label: "Total Amount",
+                        data: Object.values(summary.monthly),
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // Category Chart
+        if (categories.status !== 'empty') {
+            new Chart(document.getElementById("categoryChart"), {
+                type: "doughnut",
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        data: Object.values(categories),
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6B7280'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
+
+        // Formatter for Philippine Peso
+        const phpFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
+
+        // Forecast & Breakdown
+        if (forecast.forecast !== undefined) {
+            document.getElementById("forecastValue").innerHTML = phpFormatter.format(forecast.forecast);
+            
+            if (forecast.breakdown) {
+                document.getElementById("forecastFixed").innerHTML = phpFormatter.format(forecast.breakdown.fixed_plans);
+                document.getElementById("forecastVariable").innerHTML = phpFormatter.format(forecast.breakdown.predicted_variable);
+            } else {
+                // Fallback if breakdown data isn't ready yet
+                document.getElementById("forecastFixed").innerHTML = phpFormatter.format(0);
+                document.getElementById("forecastVariable").innerHTML = phpFormatter.format(0);
+            }
+        } else {
+            document.getElementById("forecastValue").innerHTML = "₱0.00";
+        }
+    } catch (error) {
+        console.error("Error loading reports:", error);
+        document.getElementById("forecastValue").innerHTML = "Error loading data";
+    }
+}
+
+loadReports();
+</script>
+
+{% endblock %}

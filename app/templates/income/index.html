@@ -1,0 +1,573 @@
+﻿{% extends "base.html" %}
+{% block title %}Income & Savings{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --success-green: #16A34A;
+        --danger-red: #DC2626;
+        --warning-amber: #F59E0B;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .thesis-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .thesis-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .text-primary-custom { color: var(--text-primary); }
+    .text-secondary-custom { color: var(--text-secondary); }
+
+    .btn-primary-custom { background-color: var(--primary-blue); color: white; border-radius: 8px; border: none; }
+    .btn-primary-custom:hover { background-color: #152c6b; color: white; }
+
+    .btn-outline-primary-custom { border: 1px solid var(--primary-blue); color: var(--primary-blue); border-radius: 8px; background: transparent; }
+    .btn-outline-primary-custom:hover { background-color: var(--primary-blue); color: white; }
+
+    .btn-outline-success-custom { border: 1px solid var(--success-green); color: var(--success-green); border-radius: 8px; background: transparent; }
+    .btn-outline-success-custom:hover { background-color: var(--success-green); color: white; }
+
+    .btn-outline-warning-custom { border: 1px solid var(--warning-amber); color: var(--warning-amber); border-radius: 8px; background: transparent; }
+    .btn-outline-warning-custom:hover { background-color: var(--warning-amber); color: white; }
+
+    .badge-deposit {
+        background-color: #DCFCE7;
+        color: #166534;
+        border: 1px solid #86EFAC;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .badge-withdrawal {
+        background-color: #FFE4E6;
+        color: #991B1B;
+        border: 1px solid #FCA5A5;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    /* Scrollable table styles */
+    .scrollable-table-container {
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-blue) var(--border-light);
+    }
+    
+    .scrollable-table-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .scrollable-table-container::-webkit-scrollbar-track {
+        background: var(--border-light);
+        border-radius: 4px;
+    }
+    
+    .scrollable-table-container::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 4px;
+    }
+    
+    .scrollable-table-container::-webkit-scrollbar-thumb:hover {
+        background: #152C6B;
+    }
+    
+    .scrollable-table-container thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f1f5f9;
+        z-index: 10;
+        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table-count-indicator {
+        display: inline-block;
+        background-color: var(--primary-blue);
+        color: white;
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: 0.75rem;
+        margin-left: 10px;
+    }
+
+    /* Legend items */
+    .legend-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding: 16px 20px;
+        background: #FFFFFF;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
+        border-radius: 30px;
+        border: 1px solid var(--border-light);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .legend-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+        border-color: #CBD5E1;
+    }
+    .legend-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .legend-dot-primary { background: linear-gradient(135deg, var(--primary-blue), #3B82F6); }
+    .legend-dot-success { background: linear-gradient(135deg, var(--success-green), #4ADE80); }
+    .legend-dot-warning { background: linear-gradient(135deg, var(--warning-amber), #FBBF24); }
+    .legend-dot-danger { background: linear-gradient(135deg, var(--danger-red), #F87171); }
+    .legend-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        letter-spacing: 0.3px;
+    }
+
+    .table-hover tbody tr:hover { background-color: #f1f5f9; }
+
+    /* Custom Blurred Overlay & Modal */
+    .custom-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(248, 250, 252, 0.4);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+    .custom-delete-modal {
+        background-color: #2D2D2D;
+        border-radius: 12px;
+        padding: 24px 30px;
+        width: 340px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        text-align: center;
+        color: #FFFFFF;
+    }
+    .custom-delete-modal p {
+        margin-bottom: 24px;
+        font-size: 1.05rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+    .custom-modal-buttons {
+        display: flex;
+        gap: 12px;
+    }
+    .btn-modal-delete {
+        background-color: #3B82F6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        flex: 1;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .btn-modal-delete:hover { background-color: #2563EB; color: white; }
+    .btn-modal-cancel {
+        background-color: #6B7280;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        flex: 1;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+    .btn-modal-cancel:hover { background-color: #4B5563; color: white; }
+
+    /* Button styles matching transactions page */
+    .btn-light {
+        background-color: #F3F4F6;
+        border-color: #F3F4F6;
+        color: var(--text-secondary);
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 10px 16px;
+        transition: background-color 0.2s;
+    }
+    .btn-light:hover {
+        background-color: #E5E7EB;
+        color: var(--text-primary);
+    }
+    .btn-sm {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    .rounded-circle {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .text-danger-custom {
+        color: var(--danger-red);
+    }
+    .text-danger-custom:hover {
+        color: #b91c1c;
+    }
+</style>
+
+<div class="container-fluid px-4 py-4" style="background-color: var(--bg-main); min-height: 100vh;">
+
+    <div class="mb-4">
+        <h3 class="fw-bold text-primary-custom mb-0">Income & Savings</h3>
+        <p class="text-secondary-custom small">Manage your revenue streams and track financial goals.</p>
+    </div>
+
+    <!-- Improved Color Legend -->
+    <div class="legend-container">
+        <div class="legend-item">
+            <span class="legend-dot legend-dot-primary"></span>
+            <span class="legend-label">Savings Goal (>50%)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot legend-dot-success"></span>
+            <span class="legend-label">Income / Completed Goal</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot legend-dot-warning"></span>
+            <span class="legend-label">Savings Goal (<50%) / Withdrawals</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot legend-dot-danger"></span>
+            <span class="legend-label">Delete / Critical</span>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="thesis-card p-4 h-100 d-flex flex-column justify-content-center">
+                <p class="text-secondary-custom fw-semibold mb-1 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Total Income</p>
+                <h2 class="fw-bold mb-0" style="color: var(--success-green);">P{{ "{:,.2f}".format(total_income) }}</h2>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="thesis-card p-4 h-100 d-flex flex-column justify-content-center">
+                <p class="text-secondary-custom fw-semibold mb-1 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Total Savings</p>
+                <h2 class="fw-bold mb-0" style="color: var(--primary-blue);">P{{ "{:,.2f}".format(total_savings) }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Income Records Card -->
+    <div class="thesis-card mb-5">
+        <div class="p-4 border-bottom" style="border-color: var(--border-light) !important;">
+            <h5 class="fw-bold text-primary-custom mb-0">Income Records</h5>
+        </div>
+        <div class="p-4">
+
+            <div class="mb-5 mx-auto" style="max-width: 700px; background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid var(--border-light);">
+                <h6 class="fw-bold text-primary-custom mb-3">Add New Income</h6>
+                <form method="POST" action="{{ url_for('income.add_income') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary-custom">Income Source</label>
+                            <input type="text" name="source" class="form-control shadow-none" style="border-radius: 8px;" placeholder="e.g., Salary, Freelance" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary-custom">Date</label>
+                            <input type="date" name="date_ui" class="form-control shadow-none" style="border-radius: 8px;" value="{{ now }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary-custom">Amount (P)</label>
+                            <input type="number" step="0.01" min="0" name="amount" class="form-control shadow-none fw-bold" style="border-radius: 8px; color: var(--success-green);" placeholder="0.00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary-custom">Description (Optional)</label>
+                            <input type="text" name="description" class="form-control shadow-none" style="border-radius: 8px;" placeholder="Brief note...">
+                        </div>
+                        <div class="col-12 mt-4 text-end">
+                            <button type="submit" class="btn btn-primary-custom px-4 py-2 w-100 w-md-auto">Save Income</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <form method="GET" action="{{ url_for('income.index') }}" class="row g-2 align-items-end mb-4">
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label small text-secondary-custom mb-1">Search Source</label>
+                    <input type="text" name="search_source" class="form-control form-control-sm shadow-none" style="border-radius: 6px;" placeholder="Search..." value="{{ search_source }}">
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label small text-secondary-custom mb-1">Sort Amount</label>
+                    <select name="sort_amount" class="form-select form-select-sm shadow-none" style="border-radius: 6px;">
+                        <option value="">Sort by Date (Default)</option>
+                        <option value="desc" {% if sort_amount == 'desc' %}selected{% endif %}>Highest to Lowest</option>
+                        <option value="asc" {% if sort_amount == 'asc' %}selected{% endif %}>Lowest to Highest</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                    <button type="submit" class="btn btn-sm btn-outline-primary-custom w-100">Apply Filter</button>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                    <a href="{{ url_for('income.index') }}" class="btn btn-sm btn-light w-100" style="border-radius: 6px;">Clear</a>
+                </div>
+            </form>
+
+            {% if income_records %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary-custom small">Total Records: <strong>{{ income_records|length }}</strong></span>
+                <span class="text-secondary-custom small">Scroll to see all transactions</span>
+            </div>
+            <div class="scrollable-table-container">
+                <table class="table table-hover align-middle mb-0" style="color: var(--text-primary);">
+                    <thead style="background-color: #f1f5f9; border-bottom: 2px solid var(--border-light);">
+                        <tr>
+                            <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Date</th>
+                            <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Source</th>
+                            <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0 text-end">Amount</th>
+                            <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Description</th>
+                            <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for income in income_records %}
+                        <tr style="border-bottom: 1px solid var(--border-light);">
+                            <td class="px-3">{{ income.date.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-3 fw-medium">{{ income.source }}</td>
+                            <td class="px-3 text-end fw-bold" style="color: var(--success-green);">P{{ "{:,.2f}".format(income.amount) }}</td>
+                            <td class="px-3 text-secondary-custom small">{{ income.description or '-' }}</td>
+                            <td class="px-3 text-center">
+                                {% if income.type == 'income_model' %}
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ url_for('income.edit_income', income_id=income.id) }}" class="btn btn-sm btn-light rounded-circle" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" onclick="showDeleteModal('{{ url_for('income.delete_income', income_id=income.id) }}', 'income')" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                {% else %}
+                                <span class="badge" style="background-color: #f1f5f9; color: var(--text-secondary); font-weight: normal;">Via Transactions</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <p class="text-secondary-custom mb-0">No income records yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Savings Goals Card -->
+    <div class="thesis-card mb-5">
+        <div class="p-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-color: var(--border-light) !important;">
+            <h5 class="fw-bold text-primary-custom mb-0">Savings Goals</h5>
+        </div>
+        <div class="p-4">
+
+            <div class="mb-5 mx-auto" style="max-width: 700px; background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid var(--border-light);">
+                <h6 class="fw-bold text-primary-custom mb-3">Create New Goal</h6>
+                <form method="POST" action="{{ url_for('income.add_savings') }}">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold small text-secondary-custom">Goal Name</label>
+                            <input type="text" name="goal_name" class="form-control shadow-none" style="border-radius: 8px;" placeholder="e.g., Emergency Fund, Vacation" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary-custom">Target Amount (P)</label>
+                            <input type="number" step="0.01" min="1" name="target_amount" class="form-control shadow-none" style="border-radius: 8px;" placeholder="0.00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary-custom">Initial Deposit (P) Optional</label>
+                            <input type="number" step="0.01" min="0" name="current_amount" class="form-control shadow-none" style="border-radius: 8px;" value="0">
+                        </div>
+                        <div class="col-12 mt-4 text-end">
+                            <button type="submit" class="btn btn-primary-custom px-4 py-2 w-100 w-md-auto">Create Goal</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {% if savings_goals %}
+            <div class="row g-4 mb-5">
+                {% for goal in savings_goals %}
+
+                {% set progress = (goal.current_amount / goal.target_amount * 100) if goal.target_amount > 0 else 0 %}
+                {% set progress_clamped = progress if progress <= 100 else 100 %}
+
+                {% set bar_color = "var(--warning-amber)" %}
+                {% if progress >= 100 %}
+                    {% set bar_color = "var(--success-green)" %}
+                {% elif progress >= 50 %}
+                    {% set bar_color = "var(--primary-blue)" %}
+                {% endif %}
+
+                <div class="col-xl-6">
+                    <div class="card border-0" style="background: #ffffff; border: 1px solid var(--border-light) !important; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <div class="card-body p-4">
+
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h6 class="fw-bold text-primary-custom mb-0" style="font-size: 1.1rem;">{{ goal.goal_name }}</h6>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('income.edit_savings', goal_id=goal.id) }}" class="btn btn-sm btn-light rounded-circle" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" onclick="showDeleteModal('{{ url_for('income.delete_savings', goal_id=goal.id) }}', 'savings')" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-end mb-2">
+                                <div>
+                                    <span class="text-secondary-custom small d-block">Current Balance</span>
+                                    <span class="fw-bold fs-5 text-primary-custom">P{{ "{:,.2f}".format(goal.current_amount) }}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-secondary-custom small d-block">Target</span>
+                                    <span class="fw-semibold text-secondary-custom">P{{ "{:,.2f}".format(goal.target_amount) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="progress mb-2" style="height: 12px; border-radius: 10px; background-color: #f1f5f9;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ progress_clamped }}%; background-color: {{ bar_color }}; border-radius: 10px; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="text-end mb-4">
+                                <small class="fw-semibold" style="color: {{ bar_color }};">{{ progress|round(1) }}% Complete</small>
+                            </div>
+
+                            <hr style="border-color: var(--border-light);">
+
+                            <div class="row g-2">
+                                <div class="col-sm-6">
+                                    <form method="POST" action="{{ url_for('income.deposit_savings') }}" class="d-flex gap-2">
+                                        <input type="hidden" name="savings_id" value="{{ goal.id }}">
+                                        <input type="number" step="0.01" min="0.01" name="amount" class="form-control form-control-sm shadow-none" placeholder="Amount" required style="border-radius: 6px;">
+                                        <button type="submit" class="btn btn-sm btn-outline-success-custom px-3">Deposit</button>
+                                    </form>
+                                </div>
+                                <div class="col-sm-6">
+                                    <form method="POST" action="{{ url_for('income.withdraw_savings') }}" class="d-flex gap-2">
+                                        <input type="hidden" name="savings_id" value="{{ goal.id }}">
+                                        <input type="number" step="0.01" min="0.01" name="amount" class="form-control form-control-sm shadow-none" placeholder="Amount" required style="border-radius: 6px;">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning-custom px-3">Withdraw</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <p class="text-secondary-custom mb-0">No savings goals created yet.</p>
+            </div>
+            {% endif %}
+
+            <!-- Savings Transaction History -->
+            {% if savings_transactions %}
+            <div class="mt-5">
+                <h6 class="fw-bold text-primary-custom mb-3">Savings Transaction History <span class="table-count-indicator">{{ savings_transactions|length }} transactions</span></h6>
+                <div class="scrollable-table-container">
+                    <table class="table table-hover align-middle mb-0" style="color: var(--text-primary);">
+                        <thead style="background-color: #f1f5f9; border-bottom: 2px solid var(--border-light);">
+                            <tr>
+                                <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Date</th>
+                                <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Type</th>
+                                <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Goal</th>
+                                <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0 text-end">Amount</th>
+                                <th class="py-3 px-3 fw-semibold small text-secondary-custom border-0">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tx in savings_transactions %}
+                            <tr style="border-bottom: 1px solid var(--border-light);">
+                                <td class="px-3">{{ tx.date.strftime('%Y-%m-%d') }}</td>
+                                <td class="px-3">
+                                    {% if tx.type == 'deposit' %}
+                                    <span class="badge-deposit">Deposit</span>
+                                    {% else %}
+                                    <span class="badge-withdrawal">Withdrawal</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-3 fw-medium">{{ tx.goal_name }}</td>
+                                <td class="px-3 text-end fw-bold" style="color: {% if tx.type == 'deposit' %}var(--success-green){% else %}var(--warning-amber){% endif %};">
+                                    {% if tx.type == 'deposit' %}-{% else %}+{% endif %}P{{ "{:,.2f}".format(tx.amount) }}
+                                </td>
+                                <td class="px-3 text-secondary-custom small">{{ tx.description or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div id="deleteModal" class="custom-modal-overlay">
+        <div class="custom-delete-modal">
+            <p id="deleteModalText">Delete this record?</p>
+            <div class="custom-modal-buttons">
+                <a href="#" id="confirmDeleteBtn" class="btn btn-modal-delete">Delete</a>
+                <button type="button" class="btn btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDeleteModal(deleteUrl, itemType) {
+            const modalText = document.getElementById('deleteModalText');
+            if (itemType === 'income') {
+                modalText.innerText = 'Delete this income record?';
+            } else if (itemType === 'savings') {
+                modalText.innerText = 'Delete this savings goal?';
+            }
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                closeDeleteModal();
+            }
+        }
+    </script>
+
+</div>
+{% endblock %}

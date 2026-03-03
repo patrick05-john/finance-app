@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Edit Savings Goal{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .thesis-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .btn-primary-custom { background-color: var(--primary-blue); color: white; border-radius: 8px; border: none; }
+    .btn-primary-custom:hover { background-color: #152c6b; color: white; }
+</style>
+
+<div class="container-fluid px-4 py-5" style="background-color: var(--bg-main); min-height: 100vh;">
+    <div class="mx-auto" style="max-width: 600px;">
+        
+        <div class="mb-4">
+            <a href="{{ url_for('income.index') }}" class="text-decoration-none text-secondary-custom mb-3 d-inline-block fw-medium">&larr; Back to Income & Savings</a>
+            <h3 class="fw-bold text-primary-custom mb-0">Edit Savings Goal</h3>
+            <p class="text-secondary-custom small">Adjust your financial target or current balance.</p>
+        </div>
+        
+        <div class="thesis-card p-4 p-md-5">
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small text-secondary-custom">Goal Name</label>
+                    <input type="text" name="name" class="form-control shadow-none" style="border-radius: 8px;" value="{{ goal.goal_name }}" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small text-secondary-custom">Target Amount (P)</label>
+                    <input type="number" step="0.01" min="1" name="target_amount" class="form-control shadow-none" style="border-radius: 8px;" value="{{ goal.target_amount }}" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small text-secondary-custom">Current Amount (P)</label>
+                    <input type="number" step="0.01" min="0" name="current_amount" class="form-control shadow-none fw-bold" style="border-radius: 8px; color: var(--primary-blue);" value="{{ goal.current_amount }}" required>
+                </div>
+                
+                <div class="mb-5">
+                    <label class="form-label fw-semibold small text-secondary-custom">Deadline (Optional)</label>
+                    <input type="date" name="deadline" class="form-control shadow-none" style="border-radius: 8px;" value="{{ goal.deadline.strftime('%Y-%m-%d') if goal.deadline else '' }}">
+                </div>
+                
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-primary-custom px-4 py-2 w-100">Save Changes</button>
+                    <a href="{{ url_for('income.index') }}" class="btn btn-light px-4 py-2 w-100" style="border-radius: 8px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

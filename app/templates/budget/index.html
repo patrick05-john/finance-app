@@ -1,0 +1,280 @@
+﻿{% extends "base.html" %}
+{% block title %}Budget & Expenses{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h4 mb-0 fw-bold" style="color: var(--text-primary);">Budget & Expense Management</h1>
+            <p class="text-muted small mb-0 mt-1">Track your spending limits and transaction history.</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4 gap-2" id="budgetExpenseTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active px-4" id="budget-tab" data-bs-toggle="pill" data-bs-target="#budget-content" type="button" role="tab" aria-controls="budget-content" aria-selected="true" style="border-radius: 8px;">
+                <i class="fas fa-wallet me-2"></i>Budget Management
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link px-4" id="expense-tab" data-bs-toggle="pill" data-bs-target="#expense-content" type="button" role="tab" aria-controls="expense-content" aria-selected="false" style="border-radius: 8px;">
+                <i class="fas fa-receipt me-2"></i>Expense Tracking
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="budgetExpenseTabContent">
+        <div class="tab-pane fade show active" id="budget-content" role="tabpanel" aria-labelledby="budget-tab">
+
+            {% if active_budgets %}
+                {% for budget in active_budgets %}
+                <div class="thesis-card mb-4 p-4 p-sm-5" style="border-top: 4px solid var(--primary-blue);">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color: var(--text-primary);">Active Budget: {{ budget.name }}</h5>
+                            <p class="text-muted small mb-0">
+                                <i class="far fa-calendar-alt me-1"></i> {{ budget.start_date.strftime('%b %d') }} — {{ budget.end_date.strftime('%b %d, %Y') }}
+                            </p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle shadow-none" type="button" data-bs-toggle="dropdown" style="border-radius: 6px; border-color: var(--border-light);">
+                                Manage
+                            </button>
+                            <ul class="dropdown-menu shadow-sm border-0" style="border-radius: 8px;">
+                                <li><a class="dropdown-item py-2" href="{{ url_for('budget.edit', budget_id=budget.id) }}"><i class="fas fa-edit text-muted me-2"></i>Edit Budget</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger py-2" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ budget.id }}"><i class="fas fa-trash-alt me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-md-5 mb-4 mb-md-0">
+                            <p class="text-muted small text-uppercase fw-semibold mb-1">Remaining Available</p>
+                            <h1 class="display-5 fw-bold mb-0" style="color: var(--primary-blue);">₱{{ budget.remaining | round(2) }}</h1>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="p-4" style="background-color: #f8f9fa; border-radius: 12px; border: 1px solid var(--border-light);">
+                                <div class="d-flex justify-content-between fw-semibold mb-2" style="color: var(--text-primary);">
+                                    <span>{{ budget.name }}</span>
+                                    <span>{{ budget.percent | round(1) }}% Spent</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px; border-radius: 4px; background-color: #e9ecef;">
+                                    <div class="progress-bar {% if budget.percent > 90 %}bg-danger{% elif budget.percent > 75 %}bg-warning{% else %}bg-success{% endif %}"
+                                         role="progressbar" style="width: {{ budget.percent }}%; border-radius: 4px;"></div>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted">
+                                    <span>Spent: ₱{{ budget.spent | round(2) }}</span>
+                                    <span>Total: ₱{{ budget.amount | round(2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="thesis-card mb-4 p-4 p-sm-5" style="border-top: 4px solid var(--primary-blue);">
+                    <div class="text-center py-5">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px; color: var(--primary-blue);">
+                            <i class="fas fa-wallet fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold" style="color: var(--text-primary);">No Active Budgets</h5>
+                        <p class="text-muted mb-4">Create a new budget to start tracking your spending limits.</p>
+                        <a href="{{ url_for('budget.add') }}" class="btn text-white px-4" style="background-color: var(--primary-blue); border-radius: 8px;">
+                            <i class="fas fa-plus me-2"></i>Create New Budget
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="thesis-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="mb-0 fw-bold" style="color: var(--text-primary);">Budget History</h6>
+                    <a href="{{ url_for('budget.add') }}" class="btn btn-sm btn-light shadow-none" style="border-radius: 6px; border-color: var(--border-light); color: var(--primary-blue);">
+                        <i class="fas fa-plus me-1"></i> New Budget
+                    </a>
+                </div>
+
+                {% if previous_budgets %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background-color: #f8f9fa;">
+                            <tr>
+                                <th class="text-muted small text-uppercase fw-semibold border-0 rounded-start" style="padding: 12px 16px;">Budget Name</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0" style="padding: 12px 16px;">Period</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0" style="padding: 12px 16px;">Status</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0" style="padding: 12px 16px;">Usage</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0 text-end rounded-end" style="padding: 12px 16px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for budget in previous_budgets %}
+                            <tr style="border-bottom: 1px solid var(--border-light);">
+                                <td class="fw-semibold" style="color: var(--text-primary); padding: 16px;">{{ budget.name }}</td>
+                                <td class="text-muted small" style="padding: 16px;">{{ budget.start_date.strftime('%Y-%m-%d') }} to {{ budget.end_date.strftime('%Y-%m-%d') }}</td>
+                                <td style="padding: 16px;"><span class="badge bg-light text-secondary border">Expired</span></td>
+                                <td style="padding: 16px;">
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 6px; border-radius: 3px;">
+                                            <div class="progress-bar bg-secondary" style="width: {{ budget.percent }}%; border-radius: 3px;"></div>
+                                        </div>
+                                        <span class="small text-muted">{{ budget.percent | round(1) }}%</span>
+                                    </div>
+                                </td>
+                                <td class="text-end" style="padding: 16px;">
+                                    <a href="{{ url_for('budget.edit', budget_id=budget.id) }}" class="btn btn-sm btn-light rounded-circle shadow-none" style="color: var(--text-secondary);">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">No previous budgets found.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="expense-content" role="tabpanel" aria-labelledby="expense-tab">
+
+            <div class="mb-4">
+                <h5 class="mb-0 fw-bold" style="color: var(--text-primary);">Expense Overview</h5>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="thesis-card p-4 h-100 border-start border-4" style="border-left-color: #dc3545 !important;">
+                        <p class="text-muted small text-uppercase fw-semibold mb-1">Total Expenses (All Time)</p>
+                        <h3 class="fw-bold mb-0" style="color: var(--text-primary);">₱{{ total_expenses | round(2) }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="thesis-card p-4 h-100 border-start border-4" style="border-left-color: #ffc107 !important;">
+                        <p class="text-muted small text-uppercase fw-semibold mb-1">This Month's Expenses</p>
+                        <h3 class="fw-bold mb-0" style="color: var(--text-primary);">₱{{ monthly_expenses | round(2) }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="thesis-card p-4 h-100 border-start border-4" style="border-left-color: var(--primary-blue) !important;">
+                        <p class="text-muted small text-uppercase fw-semibold mb-1">Today's Expenses</p>
+                        <h3 class="fw-bold mb-0" style="color: var(--text-primary);">₱{{ today_expenses | round(2) }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="thesis-card p-4 h-100">
+                        <h6 class="mb-4 fw-bold" style="color: var(--text-primary);">Budget vs Actual</h6>
+                        <div style="height: 250px; position: relative; width: 100%;">
+                            <canvas id="budgetActualChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="thesis-card p-4 h-100">
+                        <h6 class="mb-4 fw-bold" style="color: var(--text-primary);">Expenses by Category</h6>
+                        <div style="height: 250px; position: relative; width: 100%;">
+                            <canvas id="expenseCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thesis-card p-4">
+                <h6 class="mb-4 fw-bold" style="color: var(--text-primary);">Recent Expenses</h6>
+                {% if expenses %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background-color: #f8f9fa;">
+                            <tr>
+                                <th class="text-muted small text-uppercase fw-semibold border-0 rounded-start" style="padding: 12px 16px;">Date</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0" style="padding: 12px 16px;">Category</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0" style="padding: 12px 16px;">Description</th>
+                                <th class="text-muted small text-uppercase fw-semibold border-0 text-end rounded-end" style="padding: 12px 16px;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr style="border-bottom: 1px solid var(--border-light);">
+                                <td class="text-muted" style="padding: 16px;">{{ expense.date.strftime('%b %d, %Y') }}</td>
+                                <td style="padding: 16px;"><span class="badge bg-light text-dark border fw-normal">{{ expense.category }}</span></td>
+                                <td class="text-muted small" style="padding: 16px;">{{ expense.description or '-' }}</td>
+                                <td class="text-end fw-semibold text-danger" style="padding: 16px;">-₱{{ expense.amount | round(2) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-receipt fa-2x mb-3 text-light"></i>
+                        <p>No expenses recorded yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Delete Budget?</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-muted pt-3 pb-4">
+                Are you sure you want to delete this budget? This action will refund the remaining amount to the source.
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light shadow-none" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                <form id="delete-form" method="POST" action="">
+                    <button type="submit" class="btn btn-danger shadow-none" style="border-radius: 8px;">Delete Budget</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script id="budget-chart-data" type="application/json">
+    {
+        "budget": {
+            "total": {{ total_active_amount }},
+            "spent": {{ total_active_spent }},
+            "remaining": {{ total_active_remaining }}
+        },
+        "expenses": [
+            {% for exp in expenses %}
+                {
+                    "category": "{{ exp.category | replace('\"', '\\\"') }}",
+                    "amount": {{ exp.amount }}
+                }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+</script>
+
+<script src="{{ url_for('static', filename='js/budget_charts.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const budgetId = button.getAttribute('data-id');
+                const deleteForm = document.getElementById('delete-form');
+                deleteForm.action = '/budget/delete/' + budgetId;
+            });
+        }
+    });
+</script>
+{% endblock %}

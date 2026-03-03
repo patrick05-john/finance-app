@@ -1,0 +1,434 @@
+﻿from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from app import db
+from app.models.income import Income
+from app.models.savings import Savings
+from app.models.user import User
+from app.models.transaction import Transaction
+from app.models.savings_transaction import SavingsTransaction
+from datetime import datetime, date
+
+income_bp = Blueprint("income", __name__, url_prefix="/income")
+
+@income_bp.route("/")
+def index():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    user_id = session["user_id"]
+
+    # Get income records from Income model
+    income_records = Income.query.filter_by(user_id=user_id).order_by(Income.date.desc()).all()
+
+    # Get transaction incomes that are NOT savings-related
+    transaction_incomes = Transaction.query.filter_by(
+        user_id=user_id,
+        type='Income'
+    ).filter(
+        Transaction.category != 'Savings Withdrawal'
+    ).order_by(Transaction.date.desc()).all()
+
+    # Get savings-related transactions (withdrawals and deposits)
+    #savings_transactions = Transaction.query.filter(
+    #    Transaction.user_id == user_id,
+    #    Transaction.category.in_(['Savings Withdrawal', 'Savings Deposit'])
+    #).order_by(Transaction.date.desc()).all()
+
+    all_income_records = []
+
+    # Add Income model records
+    for income in income_records:
+        all_income_records.append({
+            'id': f'income_{income.id}',
+            'source': income.source,
+            'amount': income.amount,
+            'description': income.description,
+            'date': income.date,
+            'type': 'income_model'
+        })
+
+    # Add transaction incomes
+    for tx in transaction_incomes:
+        all_income_records.append({
+            'id': f'tx_{tx.id}',
+            'source': tx.category,
+            'amount': tx.amount,
+            'description': tx.description,
+            'date': tx.date,
+            'type': 'transaction',
+            'transaction_id': tx.id
+        })
+
+    # Sort income records by date
+    all_income_records.sort(key=lambda x: x['date'], reverse=True)
+
+    # Get savings transactions from SavingsTransaction model
+    savings_transactions = SavingsTransaction.query.filter_by(user_id=user_id).order_by(SavingsTransaction.date.desc()).all()
+    
+    savings_tx_records = []
+    for tx in savings_transactions:
+        # Get the savings goal name
+        goal = Savings.query.get(tx.savings_id)
+        goal_name = goal.goal_name if goal else "Unknown"
+        
+        savings_tx_records.append({
+            'id': tx.id,
+            'type': tx.type,
+            'goal_name': goal_name,
+            'amount': tx.amount,
+            'date': tx.date,
+            'description': tx.description or f"{tx.type.capitalize()} to/from {goal_name}"
+        })
+
+    # Apply filters to income records
+    search_source = request.args.get('search_source', '').strip().lower()
+    sort_amount = request.args.get('sort_amount', '')
+
+    if search_source:
+        all_income_records = [inc for inc in all_income_records if inc['source'] and search_source in inc['source'].lower()]
+
+    if sort_amount == 'asc':
+        all_income_records.sort(key=lambda x: x['amount'])
+    elif sort_amount == 'desc':
+        all_income_records.sort(key=lambda x: x['amount'], reverse=True)
+
+    # Get savings goals
+    savings_goals = Savings.query.filter_by(user_id=user_id).all()
+
+    # Calculate totals
+    total_income = sum([income['amount'] for income in all_income_records])
+    total_savings = sum([savings.current_amount for savings in savings_goals])
+
+    return render_template(
+        "income/index.html",
+        income_records=all_income_records,
+        savings_goals=savings_goals,
+        savings_transactions=savings_tx_records,
+        total_income=total_income,
+        total_savings=total_savings,
+        search_source=request.args.get('search_source', ''),
+        sort_amount=sort_amount
+    )
+
+@income_bp.route("/add-income", methods=["POST"])
+def add_income():
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    user_id = session["user_id"]
+    source = request.form["source"]
+    amount = float(request.form["amount"])
+    description = request.form.get("description", "")
+    
+    # Get date from form or use current date
+    date_str = request.form.get("date_ui")
+    if date_str:
+        income_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    else:
+        income_date = date.today()
+
+    # Create both Income and Transaction records
+    new_income = Income(
+        user_id=user_id, 
+        source=source, 
+        amount=amount, 
+        description=description,
+        date=datetime.combine(income_date, datetime.min.time())  # Convert date to datetime
+    )
+    
+    new_transaction = Transaction(
+        user_id=user_id, 
+        type='Income', 
+        amount=amount, 
+        category=source, 
+        description=description,
+        date=income_date
+    )
+
+    user = User.query.get(user_id)
+    user.total_balance += amount
+
+    db.session.add(new_income)
+    db.session.add(new_transaction)
+    db.session.commit()
+
+    flash("Income added successfully!", "success")
+    return redirect(url_for("income.index"))
+
+@income_bp.route("/add-savings", methods=["POST"])
+def add_savings():
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    user_id = session["user_id"]
+    goal_name = request.form["goal_name"]
+    target_amount = float(request.form["target_amount"])
+    current_amount = float(request.form.get("current_amount", 0))
+
+    new_savings = Savings(
+        user_id=user_id, 
+        goal_name=goal_name, 
+        target_amount=target_amount, 
+        current_amount=current_amount
+    )
+    db.session.add(new_savings)
+    db.session.commit()
+
+    flash("Savings goal created successfully!", "success")
+    return redirect(url_for("income.index"))
+
+@income_bp.route("/deposit-savings", methods=["POST"])
+def deposit_savings():
+    if "user_id" not in session: 
+        return redirect(url_for("auth.login"))
+    
+    user_id = session["user_id"]
+    savings_id = request.form["savings_id"]
+    amount = float(request.form["amount"])
+
+    savings = Savings.query.filter_by(id=savings_id, user_id=user_id).first()
+    user = User.query.get(user_id)
+
+    if not savings:
+        flash("Savings goal not found.", "danger")
+        return redirect(url_for("income.index"))
+
+    if user.total_balance < amount:
+        flash("Insufficient balance for deposit.", "danger")
+        return redirect(url_for("income.index"))
+
+    # Update balances
+    user.total_balance -= amount
+    savings.current_amount += amount
+    
+    # Create savings transaction record for history
+    savings_tx = SavingsTransaction(
+        user_id=user_id,
+        savings_id=savings_id,
+        type="deposit",
+        amount=amount,
+        description=f"Deposit to {savings.goal_name}"
+    )
+    db.session.add(savings_tx)
+    db.session.commit()
+    
+    flash(f"P{amount:,.2f} deposited to {savings.goal_name}!", "success")
+    return redirect(url_for("income.index"))
+
+@income_bp.route("/withdraw-savings", methods=["POST"])
+def withdraw_savings():
+    if "user_id" not in session: 
+        return redirect(url_for("auth.login"))
+    
+    user_id = session["user_id"]
+    savings_id = request.form["savings_id"]
+    amount = float(request.form["amount"])
+
+    savings = Savings.query.filter_by(id=savings_id, user_id=user_id).first()
+    user = User.query.get(user_id)
+
+    if not savings:
+        flash("Savings goal not found.", "danger")
+        return redirect(url_for("income.index"))
+
+    if savings.current_amount < amount:
+        flash("Insufficient savings balance.", "danger")
+        return redirect(url_for("income.index"))
+
+    # Update balances
+    savings.current_amount -= amount
+    user.total_balance += amount
+    
+    # Create savings transaction record for history
+    savings_tx = SavingsTransaction(
+        user_id=user_id,
+        savings_id=savings_id,
+        type="withdrawal",
+        amount=amount,
+        description=f"Withdrawal from {savings.goal_name}"
+    )
+    db.session.add(savings_tx)
+    db.session.commit()
+    
+    flash(f"P{amount:,.2f} withdrawn from {savings.goal_name}!", "success")
+    return redirect(url_for("income.index"))
+
+# Edit Income handles both models
+@income_bp.route("/edit-income/<string:income_id>", methods=["GET", "POST"])
+def edit_income(income_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    user_id = session["user_id"]
+    user = User.query.get(user_id)
+    
+    if income_id.startswith('income_'):
+        actual_id = int(income_id.replace('income_', ''))
+        record = Income.query.filter_by(id=actual_id, user_id=user_id).first_or_404()
+        # Find corresponding transaction
+        transaction = Transaction.query.filter_by(
+            user_id=user_id,
+            type='Income',
+            amount=record.amount,
+            category=record.source
+        ).order_by(Transaction.date.desc()).first()
+    elif income_id.startswith('tx_'):
+        actual_id = int(income_id.replace('tx_', ''))
+        transaction = Transaction.query.filter_by(id=actual_id, user_id=user_id, type='Income').first_or_404()
+        # Find corresponding income record if exists
+        record = Income.query.filter_by(
+            user_id=user_id,
+            source=transaction.category,
+            amount=transaction.amount
+        ).order_by(Income.date.desc()).first()
+    else:
+        flash("Invalid record.", "danger")
+        return redirect(url_for("income.index"))
+
+    if request.method == "POST":
+        new_source = request.form["source"]
+        new_amount = float(request.form["amount"])
+        new_date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        new_description = request.form.get("description", "")
+        
+        # Get the amount to adjust
+        old_amount = record.amount if record else transaction.amount
+        amount_difference = new_amount - old_amount
+        
+        # Update user balance
+        user.total_balance += amount_difference
+        
+        # Update income record if it exists
+        if record:
+            record.source = new_source
+            record.amount = new_amount
+            record.description = new_description
+            record.date = datetime.combine(new_date, datetime.min.time())
+        
+        # Update transaction
+        if transaction:
+            transaction.category = new_source
+            transaction.amount = new_amount
+            transaction.description = new_description
+            transaction.date = new_date
+        
+        db.session.commit()
+        flash("Income updated successfully!", "success")
+        return redirect(url_for("income.index"))
+
+    # Prepare data for template
+    if record:
+        income_data = {
+            'id': income_id,
+            'source': record.source,
+            'amount': record.amount,
+            'date': record.date,
+            'description': record.description
+        }
+    else:
+        income_data = {
+            'id': income_id,
+            'source': transaction.category,
+            'amount': transaction.amount,
+            'date': transaction.date,
+            'description': transaction.description
+        }
+    
+    return render_template("income/edit_income.html", income=income_data)
+
+# Delete Income handles both models
+@income_bp.route("/delete-income/<string:income_id>")
+def delete_income(income_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    user_id = session["user_id"]
+    user = User.query.get(user_id)
+
+    if income_id.startswith('income_'):
+        actual_id = int(income_id.replace('income_', ''))
+        record = Income.query.filter_by(id=actual_id, user_id=user_id).first_or_404()
+        
+        # Find and delete corresponding transaction
+        transaction = Transaction.query.filter_by(
+            user_id=user_id,
+            type='Income',
+            amount=record.amount,
+            category=record.source
+        ).first()
+        
+        if transaction:
+            db.session.delete(transaction)
+        
+        user.total_balance -= record.amount
+        db.session.delete(record)
+        
+    elif income_id.startswith('tx_'):
+        actual_id = int(income_id.replace('tx_', ''))
+        transaction = Transaction.query.filter_by(id=actual_id, user_id=user_id, type='Income').first_or_404()
+        
+        # Find and delete corresponding income record if exists
+        record = Income.query.filter_by(
+            user_id=user_id,
+            source=transaction.category,
+            amount=transaction.amount
+        ).first()
+        
+        if record:
+            db.session.delete(record)
+        
+        user.total_balance -= transaction.amount
+        db.session.delete(transaction)
+    else:
+        return redirect(url_for("income.index"))
+
+    db.session.commit()
+    flash("Income deleted successfully!", "success")
+    return redirect(url_for("income.index"))
+
+@income_bp.route("/delete-confirm/<item_type>/<string:item_id>")
+def delete_confirm(item_type, item_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    return render_template("income/delete_confirm.html", item_type=item_type, item_id=item_id)
+
+@income_bp.route("/edit-savings/<int:goal_id>", methods=["GET", "POST"])
+def edit_savings(goal_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    user_id = session["user_id"]
+    goal = Savings.query.filter_by(id=goal_id, user_id=user_id).first_or_404()
+
+    if request.method == "POST":
+        old_amount = goal.current_amount
+        goal.goal_name = request.form["name"]
+        goal.target_amount = float(request.form["target_amount"])
+        new_current = float(request.form["current_amount"])
+        
+        if new_current != old_amount:
+            user = User.query.get(user_id)
+            difference = new_current - old_amount
+            if difference > 0:
+                if user.total_balance >= difference:
+                    user.total_balance -= difference
+                else:
+                    flash("Insufficient balance for this adjustment.", "danger")
+                    return redirect(url_for("income.edit_savings", goal_id=goal_id))
+            else:
+                user.total_balance += abs(difference)
+        
+        goal.current_amount = new_current
+
+        deadline_str = request.form.get("deadline")
+        if deadline_str:
+            goal.deadline = datetime.strptime(deadline_str, "%Y-%m-%d").date()
+
+        db.session.commit()
+        flash("Savings goal updated successfully!", "success")
+        return redirect(url_for("income.index"))
+
+    return render_template("income/edit_savings_goal.html", goal=goal)
+
+@income_bp.route("/delete-savings/<int:goal_id>")
+def delete_savings(goal_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    user_id = session["user_id"]
+    goal = Savings.query.filter_by(id=goal_id, user_id=user_id).first_or_404()
+
+    if goal.current_amount > 0:
+        user = User.query.get(user_id)
+        user.total_balance += goal.current_amount
+
+    db.session.delete(goal)
+    db.session.commit()
+    flash("Savings goal removed!", "success")
+    return redirect(url_for("income.index"))

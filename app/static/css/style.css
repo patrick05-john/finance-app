@@ -1,0 +1,113 @@
+﻿/* ----------------------------------------------------------------
+ * GLOBAL DESIGN SYSTEM (THESIS PALETTE)
+ * ---------------------------------------------------------------- */
+:root {
+    --primary-blue: #1E3A8A;
+    --success-green: #16A34A;
+    --danger-red: #DC2626;
+    --warning-amber: #F59E0B;
+    --bg-neutral: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --border-light: #E5E7EB;
+}
+
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: var(--bg-neutral);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Force navbar to the absolute top to ignore invisible BOM text nodes */
+.navbar {
+    margin-top: 0 !important;
+    top: 0 !important;
+}
+
+/* Custom Scrollbar for Notes & Reminders */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border-light); 
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary); 
+}
+
+/* ----------------------------------------------------------------
+ * DASHBOARD CARDS & COMPONENTS
+ * ---------------------------------------------------------------- */
+.thesis-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.icon-bg-primary { background-color: #EFF6FF; color: var(--primary-blue); }
+.icon-bg-success { background-color: #F0FDF4; color: var(--success-green); }
+.icon-bg-danger { background-color: #FEF2F2; color: var(--danger-red); }
+.icon-bg-warning { background-color: #FFFBEB; color: var(--warning-amber); }
+
+.badge-soft-success { background-color: #F0FDF4; color: var(--success-green); border: 1px solid #BBF7D0; }
+.badge-soft-danger { background-color: #FEF2F2; color: var(--danger-red); border: 1px solid #FECACA; }
+.badge-soft-neutral { background-color: #F3F4F6; color: var(--text-secondary); border: 1px solid #E5E7EB; }
+
+.legend-dot {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* ----------------------------------------------------------------
+ * NAVBAR TWEAKS
+ * ---------------------------------------------------------------- */
+.navbar-nav .nav-link {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.navbar-nav .nav-link:hover {
+    background-color: #EFF6FF !important;
+    color: var(--primary-blue) !important;
+    border-radius: 8px;
+}
+.navbar-nav .nav-link.active {
+    background-color: #EFF6FF !important;
+    border-radius: 8px;
+}
+
+/* ----------------------------------------------------------------
+ * MOBILE RESPONSIVENESS (Table to Cards)
+ * ---------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .mobile-cards-table thead { display: none; }
+    .mobile-cards-table tbody tr {
+        display: block; margin-bottom: 1rem; border: 1px solid var(--border-light);
+        border-radius: 12px; background: var(--card-bg); padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .mobile-cards-table tbody td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0.5rem 0; border-bottom: 1px solid var(--bg-neutral); text-align: right;
+    }
+    .mobile-cards-table tbody td:last-child { border-bottom: none; }
+    .mobile-cards-table tbody td::before {
+        content: attr(data-label); font-weight: 600; color: var(--text-secondary);
+        font-size: 0.85rem; text-align: left;
+    }
+}

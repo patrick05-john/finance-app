@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Confirm Deletion{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --danger-red: #DC2626;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .thesis-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .btn-danger-custom { background-color: var(--danger-red); color: white; border-radius: 8px; border: none; }
+    .btn-danger-custom:hover { background-color: #b91c1c; color: white; }
+</style>
+
+<div class="container-fluid px-4 py-5 d-flex align-items-center justify-content-center" style="background-color: var(--bg-main); min-height: 100vh;">
+    <div class="thesis-card p-5 text-center" style="max-width: 480px; width: 100%;">
+        
+        <div class="mb-4">
+            <div class="mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px; background-color: #fee2e2; border-radius: 50%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16" style="color: var(--danger-red);">
+                    <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+                    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.553.553 0 0 1-1.1 0z"/>
+                </svg>
+            </div>
+            <h4 class="fw-bold mb-2" style="color: var(--text-primary);">Are you sure?</h4>
+            <p class="small mb-0" style="color: var(--text-secondary);">
+                {% if item_type == 'income' %}
+                Do you really want to delete this income record? This action will adjust your total balance and cannot be undone.
+                {% else %}
+                Do you really want to delete this savings goal? Any funds you stored here will be immediately returned to your main balance.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-center mt-4">
+            <a href="{{ url_for('income.index') }}" class="btn btn-light px-4 py-2 fw-medium" style="border-radius: 8px;">Cancel</a>
+            
+            {% if item_type == 'income' %}
+            <a href="{{ url_for('income.delete_income', income_id=item_id) }}" class="btn btn-danger-custom px-4 py-2 fw-medium">Yes, Delete</a>
+            {% else %}
+            <a href="{{ url_for('income.delete_savings', goal_id=item_id) }}" class="btn btn-danger-custom px-4 py-2 fw-medium">Yes, Delete</a>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

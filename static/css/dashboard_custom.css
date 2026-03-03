@@ -1,0 +1,42 @@
+/* Notes Card Sizing and Scrolling */
+.notes-card {
+    min-height: 200px; /* Base height */
+    max-height: 400px; /* Stops expanding here, starts scrolling */
+    transition: all 0.3s ease-in-out;
+}
+
+.notes-body {
+    overflow-y: auto; /* Enables scrolling when max-height is reached */
+    flex-grow: 1;
+}
+
+/* Custom Scrollbar for Notes */
+.notes-body::-webkit-scrollbar {
+    width: 6px;
+}
+.notes-body::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+}
+.notes-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1; 
+    border-radius: 4px;
+}
+.notes-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8; 
+}
+
+/* Responsive Ordering: Move Transactions to bottom on mobile */
+@media (max-width: 991.98px) {
+    /* Ensure the parent container uses flexbox to enable ordering */
+    .dashboard-layout-row {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Pushes Recent Transactions to the very bottom */
+    .recent-transactions-wrapper {
+        order: 999;
+        margin-top: 1rem;
+    }
+}

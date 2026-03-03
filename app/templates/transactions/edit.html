@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Edit Transaction{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('transactions.index') }}" class="btn btn-sm btn-light rounded-circle me-3" style="color: var(--text-secondary);">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h4 mb-0 fw-bold" style="color: var(--text-primary);">Edit Transaction</h1>
+                </div>
+            </div>
+
+            <div class="thesis-card p-4 p-sm-5">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.type.id }}" class="form-label fw-semibold small text-muted">Transaction Type</label>
+                            {{ form.type(class="form-select shadow-none", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                            <div class="form-text" style="font-size: 0.75rem;">Select income, expense, or payment.</div>
+                            {% for error in form.type.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.amount.id }}" class="form-label fw-semibold small text-muted">Amount (P)</label>
+                            {{ form.amount(class="form-control shadow-none fw-bold", placeholder="0.00", style="border-radius: 8px; border-color: var(--border-light); color: var(--primary-blue);", required=true) }}
+                            <div class="form-text" style="font-size: 0.75rem;">Enter numeric value.</div>
+                            {% for error in form.amount.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.category.id }}" class="form-label fw-semibold small text-muted">Category</label>
+                            {{ form.category(class="form-control shadow-none", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                            {% for error in form.category.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.date.id }}" class="form-label fw-semibold small text-muted">Date</label>
+                            {{ form.date(class="form-control shadow-none", type="date", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                            {% for error in form.date.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4" id="custom-category-group" style="display: none;">
+                        <label for="{{ form.custom_category.id }}" class="form-label fw-semibold small text-muted">Specify Other Category (Optional)</label>
+                        {{ form.custom_category(class="form-control shadow-none", placeholder="E.g., Pet Supplies, Gifts...", style="border-radius: 8px; border-color: var(--border-light);") }}
+                    </div>
+
+                    <div class="mb-4" id="deduct-from-group" style="display: none;">
+                        <label for="{{ form.deduct_from.id }}" class="form-label fw-semibold small text-muted">Funding Source</label>
+                        <select id="{{ form.deduct_from.id }}" name="{{ form.deduct_from.name }}" class="form-select shadow-none" style="border-radius: 8px; border-color: var(--border-light);">
+                            <option value="">Select Account (Optional)</option>
+                            {% for value, label in form.deduct_from.choices %}
+                                <option value="{{ value }}" {% if form.deduct_from.data == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text text-warning" style="font-size: 0.75rem;"><i class="fas fa-info-circle me-1"></i>Select an account or budget to deduct this expense from.</div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="{{ form.description.id }}" class="form-label fw-semibold small text-muted">Description (Optional)</label>
+                        {{ form.description(class="form-control shadow-none", rows="3", placeholder="Add a brief note about this transaction...", style="border-radius: 8px; border-color: var(--border-light);") }}
+                    </div>
+
+                    <hr style="border-color: var(--border-light);">
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('transactions.index') }}" class="btn btn-light border-0" style="border-radius: 8px; color: var(--text-secondary);">Cancel</a>
+                        <button type="submit" class="btn text-white px-4" style="background-color: var(--primary-blue); border-radius: 8px;">
+                            <i class="fas fa-save me-2"></i> Update Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('{{ form.type.id }}');
+        const deductFromGroup = document.getElementById('deduct-from-group');
+        const categorySelect = document.getElementById('{{ form.category.id }}');
+        const customCategoryGroup = document.getElementById('custom-category-group');
+        const customCategoryInput = document.getElementById('{{ form.custom_category.id }}');
+
+        function toggleFundingSource() {
+            if (typeSelect.value === 'Expense' || typeSelect.value === 'Debt Payment' || typeSelect.value === 'Credit Payment') {
+                deductFromGroup.style.display = 'block';
+                deductFromGroup.style.opacity = 0;
+                setTimeout(() => deductFromGroup.style.opacity = 1, 50);
+                deductFromGroup.style.transition = 'opacity 0.3s ease';
+            } else {
+                deductFromGroup.style.display = 'none';
+            }
+        }
+
+        function toggleCustomCategory() {
+            if (categorySelect.value === 'Other') {
+                customCategoryGroup.style.display = 'block';
+                customCategoryGroup.style.opacity = 0;
+                setTimeout(() => customCategoryGroup.style.opacity = 1, 50);
+                customCategoryGroup.style.transition = 'opacity 0.3s ease';
+            } else {
+                customCategoryGroup.style.display = 'none';
+                customCategoryInput.value = ''; // Clear value if hidden
+            }
+        }
+
+        // Check on load (important for Edit pages where values are pre-filled)
+        toggleFundingSource();
+        toggleCustomCategory();
+
+        // Check on change
+        typeSelect.addEventListener('change', toggleFundingSource);
+        categorySelect.addEventListener('change', toggleCustomCategory);
+    });
+</script>
+{% endblock %}

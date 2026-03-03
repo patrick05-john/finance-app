@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center py-5" style="min-height: 85vh;">
+    <div class="card border-0 w-100 thesis-card" style="max-width: 500px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+        <div class="card-body p-4 p-md-5">
+            
+            <div class="text-center mb-4">
+                <h2 class="fw-bold mb-2" style="color: var(--text-primary, #111827); letter-spacing: -0.5px;">Create Your Account</h2>
+                <p style="color: var(--text-secondary, #6B7280); font-size: 0.95rem;">Start managing your finances today.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.register') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" style="color: var(--text-primary, #111827); font-size: 0.9rem;">Full Name</label>
+                    {{ form.name(class="form-control form-control-lg border", placeholder="John Doe", style="border-radius: 8px; font-size: 0.95rem; background-color: var(--bg-neutral, #F8FAFC);") }}
+                    {% for error in form.name.errors %}
+                        <small class="text-danger mt-1 d-block">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" style="color: var(--text-primary, #111827); font-size: 0.9rem;">Email Address</label>
+                    {{ form.email(class="form-control form-control-lg border", placeholder="name@example.com", style="border-radius: 8px; font-size: 0.95rem; background-color: var(--bg-neutral, #F8FAFC);") }}
+                    {% for error in form.email.errors %}
+                        <small class="text-danger mt-1 d-block">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-1" style="color: var(--text-primary, #111827); font-size: 0.9rem;">Password</label>
+                    <div class="input-group">
+                        {{ form.password(class="form-control form-control-lg border-end-0 border", id="regPasswordInput", placeholder="Create a strong password", style="border-radius: 8px 0 0 8px; font-size: 0.95rem; background-color: var(--bg-neutral, #F8FAFC);") }}
+                        <button class="btn border border-start-0 toggle-pw" type="button" data-target="#regPasswordInput" style="border-radius: 0 8px 8px 0; background-color: var(--bg-neutral, #F8FAFC);">
+                            <i class="far fa-eye text-muted"></i>
+                        </button>
+                    </div>
+                    {% for error in form.password.errors %}
+                        <small class="text-danger mt-1 d-block">{{ error }}</small>
+                    {% endfor %}
+                    
+                    <div class="progress mt-2" style="height: 4px; border-radius: 2px; background-color: #E5E7EB;">
+                        <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%; transition: width 0.3s ease, background-color 0.3s ease;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small id="strengthText" class="text-muted" style="font-size: 0.75rem;"></small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold mb-1" style="color: var(--text-primary, #111827); font-size: 0.9rem;">Confirm Password</label>
+                    <div class="input-group">
+                        {{ form.confirm_password(class="form-control form-control-lg border-end-0 border", id="regConfirmPasswordInput", placeholder="Repeat your password", style="border-radius: 8px 0 0 8px; font-size: 0.95rem; background-color: var(--bg-neutral, #F8FAFC);") }}
+                        <button class="btn border border-start-0 toggle-pw" type="button" data-target="#regConfirmPasswordInput" style="border-radius: 0 8px 8px 0; background-color: var(--bg-neutral, #F8FAFC);">
+                            <i class="far fa-eye text-muted"></i>
+                        </button>
+                    </div>
+                    {% for error in form.confirm_password.errors %}
+                        <small class="text-danger mt-1 d-block">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn w-100 py-2 mb-4 fw-bold text-white shadow-sm" style="background-color: var(--primary-blue, #1E3A8A); border-radius: 8px; font-size: 1rem; transition: all 0.2s ease-in-out;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="text-center">
+                <p class="mb-0" style="color: var(--text-secondary, #6B7280); font-size: 0.9rem;">
+                    Already have an account? 
+                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold" style="color: var(--primary-blue, #1E3A8A);">Login here</a>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Show/Hide Password Toggle
+        const toggleButtons = document.querySelectorAll('.toggle-pw');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.querySelector(targetId);
+                const icon = this.querySelector('i');
+                
+                if (input.getAttribute('type') === 'password') {
+                    input.setAttribute('type', 'text');
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.setAttribute('type', 'password');
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // 2. Real-time Password Strength Indicator
+        const passwordInput = document.getElementById('regPasswordInput');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+
+        passwordInput.addEventListener('input', function() {
+            const val = passwordInput.value;
+            let strength = 0;
+            
+            if (val.length > 0) strength += 1;
+            if (val.length >= 6) strength += 1;
+            if (val.length >= 8 && /[A-Z]/.test(val) && /[0-9]/.test(val)) strength += 1;
+
+            if (strength === 0) {
+                strengthBar.style.width = '0%';
+                strengthText.innerText = '';
+            } else if (strength === 1) {
+                strengthBar.style.width = '33%';
+                strengthBar.style.backgroundColor = '#DC2626'; // Danger Red
+                strengthText.innerText = 'Weak';
+                strengthText.style.color = '#DC2626';
+            } else if (strength === 2) {
+                strengthBar.style.width = '66%';
+                strengthBar.style.backgroundColor = '#F59E0B'; // Warning Amber
+                strengthText.innerText = 'Fair';
+                strengthText.style.color = '#F59E0B';
+            } else {
+                strengthBar.style.width = '100%';
+                strengthBar.style.backgroundColor = '#16A34A'; // Success Green
+                strengthText.innerText = 'Strong';
+                strengthText.style.color = '#16A34A';
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,109 @@
+﻿{% extends "base.html" %}
+{% block title %}Add Debt / Credit{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --success-green: #16A34A;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .text-primary-custom { color: var(--text-primary); }
+    .text-secondary-custom { color: var(--text-secondary); }
+    .btn-primary-custom { background-color: var(--primary-blue); color: white; border-radius: 8px; border: none; }
+    .btn-primary-custom:hover { background-color: #152c6b; color: white; }
+    .form-control, .form-select { border-radius: 8px; border: 1px solid var(--border-light); box-shadow: none !important; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary-blue); }
+</style>
+
+<div class="container-fluid px-4 py-5" style="background-color: var(--bg-main); min-height: 100vh;">
+    <div class="mx-auto" style="max-width: 700px; background: #FFFFFF; padding: 32px; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+            <h4 class="fw-bold text-primary-custom mb-0">Add Liability</h4>
+            <a href="{{ url_for('debt.index') }}" class="btn btn-sm btn-light" style="border-radius: 6px;">Back to Dashboard</a>
+        </div>
+
+        <form method="POST" action="{{ url_for('debt.add') }}">
+            {{ form.hidden_tag() if form.hidden_tag else '' }}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Account Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g., Chase Sapphire, Car Loan" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Type</label>
+                    <select name="debt_type" id="debt_type" class="form-select" onchange="toggleFields()" required>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Loan">Loan</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Current Balance (₱)</label>
+                    <input type="number" step="0.01" min="0" name="balance" class="form-control" placeholder="0.00" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Minimum Payment (₱)</label>
+                    <input type="number" step="0.01" min="0" name="minimum_payment" class="form-control" placeholder="0.00" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Monthly Due Day (1-31)</label>
+                    <input type="number" name="monthly_due_date" min="1" max="31" class="form-control" placeholder="e.g., 15" required>
+                </div>
+
+                <div class="col-md-6" id="limit_field">
+                    <label class="form-label fw-semibold small text-secondary-custom">Credit Limit (₱)</label>
+                    <input type="number" step="0.01" min="0" name="limit_amount" class="form-control" placeholder="0.00">
+                </div>
+
+                <div class="col-12" id="loan_fields" style="display: none;">
+                    <div class="p-3 mt-2 rounded" style="background-color: #f8fafc; border: 1px solid var(--border-light);">
+                        <h6 class="fw-semibold text-primary-custom mb-3 small text-uppercase" style="letter-spacing: 0.5px;">Loan Specifics</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-secondary-custom">Start Date</label>
+                                <input type="date" name="loan_start_date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-secondary-custom">End Date</label>
+                                <input type="date" name="loan_end_date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-4 text-end">
+                    <button type="submit" class="btn btn-primary-custom px-4 py-2 w-100 w-md-auto">Save Account</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleFields() {
+        const type = document.getElementById('debt_type').value;
+        const limitField = document.getElementById('limit_field');
+        const loanFields = document.getElementById('loan_fields');
+
+        if (type === 'Credit Card') {
+            limitField.style.display = 'block';
+            loanFields.style.display = 'none';
+        } else if (type === 'Loan') {
+            limitField.style.display = 'none';
+            loanFields.style.display = 'block';
+        } else {
+            limitField.style.display = 'none';
+            loanFields.style.display = 'none';
+        }
+    }
+    document.addEventListener("DOMContentLoaded", toggleFields);
+</script>
+{% endblock %}

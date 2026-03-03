@@ -1,0 +1,22 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+    <h3>Add Income</h3>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.amount.label }}
+            {{ form.amount(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.source.label }}
+            {{ form.source(class="form-control") }}
+        </div>
+
+        <button class="btn btn-success w-100">Add Income</button>
+    </form>
+</div>
+{% endblock %}

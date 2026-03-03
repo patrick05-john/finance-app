@@ -1,0 +1,73 @@
+﻿{% extends "base.html" %}
+{% block title %}Edit Budget{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('budget.index') }}" class="btn btn-sm btn-light rounded-circle me-3" style="color: var(--text-secondary);">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h4 mb-0 fw-bold" style="color: var(--text-primary);">Edit Budget</h1>
+                </div>
+            </div>
+
+            <div class="thesis-card p-4 p-sm-5">
+                <form method="POST" action="">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small text-muted">Budget Name</label>
+                        <input type="text" name="name" class="form-control shadow-none" value="{{ budget.name }}" style="border-radius: 8px; border-color: var(--border-light);" required>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-muted">Total Budget Amount (₱)</label>
+                            <input type="number" step="0.01" name="amount" class="form-control shadow-none fw-bold" value="{{ budget.amount }}" style="border-radius: 8px; border-color: var(--border-light); color: var(--primary-blue);" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-muted">Funding Source</label>
+                            <select name="funding_source" class="form-select shadow-none" style="border-radius: 8px; border-color: var(--border-light);" required>
+                                <option value="income" {% if budget.funding_source == 'income' %}selected{% endif %}>Income</option>
+                                <option value="savings" {% if budget.funding_source == 'savings' %}selected{% endif %}>Savings</option>
+                                <option value="credit" {% if budget.funding_source == 'credit' %}selected{% endif %}>Credit</option>
+                                <option value="others" {% if budget.funding_source == 'others' %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-muted">Start Date</label>
+                            <input type="date" name="start_date" class="form-control shadow-none" value="{{ budget.start_date }}" style="border-radius: 8px; border-color: var(--border-light);" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-muted">End Date</label>
+                            <input type="date" name="end_date" class="form-control shadow-none" value="{{ budget.end_date }}" style="border-radius: 8px; border-color: var(--border-light);" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label fw-semibold small text-muted">Description (Optional)</label>
+                        <textarea name="description" class="form-control shadow-none" rows="3" style="border-radius: 8px; border-color: var(--border-light);">{{ budget.description }}</textarea>
+                    </div>
+
+                    <hr style="border-color: var(--border-light);">
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('budget.index') }}" class="btn btn-light border-0" style="border-radius: 8px; color: var(--text-secondary);">Cancel</a>
+                        <button type="submit" class="btn text-white px-4" style="background-color: var(--primary-blue); border-radius: 8px;">
+                            <i class="fas fa-save me-2"></i> Save Changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

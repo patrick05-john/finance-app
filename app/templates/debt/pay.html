@@ -1,0 +1,146 @@
+﻿{% extends "base.html" %}
+{% block title %}Make Payment{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --success-green: #16A34A;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .payment-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .payment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .text-primary-custom { color: var(--text-primary); }
+    .text-secondary-custom { color: var(--text-secondary); }
+    .btn-primary-custom { 
+        background-color: var(--primary-blue); 
+        color: white; 
+        border-radius: 8px; 
+        border: none; 
+        padding: 10px 16px;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+    .btn-primary-custom:hover { 
+        background-color: #152c6b; 
+        color: white; 
+    }
+    .btn-light-custom {
+        background-color: #F3F4F6;
+        border: 1px solid var(--border-light);
+        color: var(--text-secondary);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+    .btn-light-custom:hover {
+        background-color: #E5E7EB;
+        color: var(--text-primary);
+    }
+    .form-control, .form-select { 
+        border-radius: 8px; 
+        border: 1px solid var(--border-light); 
+        box-shadow: none !important; 
+        font-size: 0.875rem;
+        padding: 10px 12px;
+    }
+    .form-control:focus, .form-select:focus { 
+        border-color: var(--primary-blue); 
+        box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important;
+    }
+    .balance-display {
+        background-color: #f1f5f9;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .balance-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .balance-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        line-height: 1.2;
+    }
+    .info-text {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-top: 8px;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 6px;
+    }
+</style>
+
+<div class="container-fluid px-4 py-5" style="background-color: var(--bg-main); min-height: 100vh;">
+    <div class="payment-card p-4 p-md-5">
+        
+        <div class="text-center mb-4">
+            <h4 class="fw-bold text-primary-custom mb-1">Make a Payment</h4>
+            <p class="text-secondary-custom small mb-0">Record a payment for {{ debt.name }}</p>
+        </div>
+
+        <div class="balance-display">
+            <div class="balance-label">Current Balance</div>
+            <div class="balance-amount">P{{ "{:,.2f}".format(debt.balance) }}</div>
+        </div>
+
+        <div class="mb-4 p-3 rounded" style="background-color: #f8fafc; border: 1px solid var(--border-light);">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-primary-custom">Available Balance</span>
+                <span class="fw-bold" style="color: var(--success-green);">P{{ "{:,.2f}".format(user.total_balance) }}</span>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('debt.pay', debt_id=debt.id) }}">
+            {{ form.hidden_tag() if form.hidden_tag else '' }}
+            
+            <input type="hidden" name="funding_source" value="balance">
+            <input type="hidden" name="income_source" value="0">
+
+            <div class="mb-4">
+                <label class="form-label">Payment Amount (P)</label>
+                <input type="number" step="0.01" min="0.01" max="{{ user.total_balance }}" name="amount" class="form-control fw-bold" style="color: var(--success-green);" placeholder="0.00" required>
+                <div class="info-text">This will be deducted from your main balance</div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('debt.index') }}" class="btn-light-custom flex-fill">Cancel</a>
+                <button type="submit" class="btn-primary-custom flex-fill">Submit Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

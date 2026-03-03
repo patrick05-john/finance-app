@@ -1,0 +1,139 @@
+﻿{% extends "base.html" %}
+{% block title %}Edit Debt / Credit{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .text-primary-custom { color: var(--text-primary); }
+    .text-secondary-custom { color: var(--text-secondary); }
+    .btn-primary-custom { background-color: var(--primary-blue); color: white; border-radius: 8px; border: none; }
+    .btn-primary-custom:hover { background-color: #152c6b; color: white; }
+    .form-control, .form-select { border-radius: 8px; border: 1px solid var(--border-light); box-shadow: none !important; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary-blue); }
+</style>
+
+<div class="container-fluid px-4 py-5" style="background-color: var(--bg-main); min-height: 100vh;">
+    <div class="mx-auto" style="max-width: 700px; background: #FFFFFF; padding: 32px; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+            <h4 class="fw-bold text-primary-custom mb-0">Edit Account</h4>
+            <a href="{{ url_for('debt.index') }}" class="btn btn-sm btn-light" style="border-radius: 6px;">Cancel</a>
+        </div>
+
+        <form method="POST" action="{{ url_for('debt.edit_debt', debt_id=debt.id) }}">
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Account Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ debt.name }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Type</label>
+                    <select name="type" id="debt_type" class="form-select" onchange="toggleFields()" required>
+                        <option value="Credit Card" {% if debt.debt_type == 'Credit Card' %}selected{% endif %}>Credit Card</option>
+                        <option value="Loan" {% if debt.debt_type == 'Loan' %}selected{% endif %}>Loan</option>
+                        <option value="Personal" {% if debt.debt_type == 'Personal' %}selected{% endif %}>Personal</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Current Balance (₱)</label>
+                    <input type="number" step="0.01" min="0" name="balance" class="form-control" value="{{ debt.balance }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-secondary-custom">Minimum Payment (₱)</label>
+                    <input type="number" step="0.01" min="0" name="minimum_payment" class="form-control" value="{{ debt.minimum_payment }}" required>
+                </div>
+
+                <div class="col-12" id="cc_personal_fields" style="display: none;">
+                    <div class="p-3 mt-2 rounded" style="background-color: #f8fafc; border: 1px solid var(--border-light);">
+                        <h6 class="fw-semibold text-primary-custom mb-3 small text-uppercase" style="letter-spacing: 0.5px;" id="cc_personal_title">Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6" id="due_date_container">
+                                <label class="form-label fw-semibold small text-secondary-custom">Next Due Date</label>
+                                <input type="date" name="due_date" id="due_date_input" class="form-control" value="{{ debt.due_date }}">
+                            </div>
+            
+                            <div class="col-md-6" id="limit_field">
+                                <label class="form-label fw-semibold small text-secondary-custom">Credit Limit (₱)</label>
+                                <input type="number" step="0.01" min="0" name="limit" id="limit_input" class="form-control" value="{{ debt.limit_amount or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12" id="loan_fields" style="display: none;">
+                    <div class="p-3 mt-2 rounded" style="background-color: #f8fafc; border: 1px solid var(--border-light);">
+                        <h6 class="fw-semibold text-primary-custom mb-3 small text-uppercase" style="letter-spacing: 0.5px;">Loan Specifics</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-secondary-custom">Start Date</label>
+                                <input type="date" name="loan_start_date" id="loan_start_input" class="form-control" value="{{ debt.loan_start_date or '' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-secondary-custom">End Date</label>
+                                <input type="date" name="loan_end_date" id="loan_end_input" class="form-control" value="{{ debt.loan_end_date or '' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-secondary-custom">Monthly Due Day</label>
+                                <input type="number" min="1" max="31" name="monthly_due_date" id="monthly_due_input" class="form-control" value="{{ debt.monthly_due_date or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-4 text-end">
+                    <button type="submit" class="btn btn-primary-custom px-4 py-2 w-100 w-md-auto">Update Account</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleFields() {
+        const type = document.getElementById('debt_type').value;
+        
+        const ccPersonalFields = document.getElementById('cc_personal_fields');
+        const limitField = document.getElementById('limit_field');
+        const loanFields = document.getElementById('loan_fields');
+        const ccPersonalTitle = document.getElementById('cc_personal_title');
+        
+        const dueDateInput = document.getElementById('due_date_input');
+        const monthlyDueInput = document.getElementById('monthly_due_input');
+
+        if (type === 'Credit Card') {
+            ccPersonalFields.style.display = 'block';
+            limitField.style.display = 'block';
+            loanFields.style.display = 'none';
+            ccPersonalTitle.innerText = "Credit Card Specifics";
+            
+            dueDateInput.required = true;
+            monthlyDueInput.required = false;
+        } else if (type === 'Loan') {
+            ccPersonalFields.style.display = 'none';
+            limitField.style.display = 'none';
+            loanFields.style.display = 'block';
+            
+            dueDateInput.required = false;
+            monthlyDueInput.required = true;
+        } else { // Personal
+            ccPersonalFields.style.display = 'block';
+            limitField.style.display = 'none';
+            loanFields.style.display = 'none';
+            ccPersonalTitle.innerText = "Details";
+            
+            dueDateInput.required = true;
+            monthlyDueInput.required = false;
+        }
+    }
+    // Initialize on load
+    document.addEventListener("DOMContentLoaded", toggleFields);
+</script>
+{% endblock %}

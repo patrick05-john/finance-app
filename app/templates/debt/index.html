@@ -1,0 +1,651 @@
+﻿{% extends "base.html" %}
+{% block title %}Debt & Credit Management{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --success-green: #16A34A;
+        --danger-red: #DC2626;
+        --warning-amber: #F59E0B;
+        --bg-main: #F8FAFC;
+        --border-light: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    .thesis-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .thesis-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .text-primary-custom { color: var(--text-primary); }
+    .text-secondary-custom { color: var(--text-secondary); }
+
+    .btn-primary-custom {
+        background-color: var(--primary-blue);
+        color: white;
+        border-radius: 8px;
+        border: none;
+        padding: 10px 16px;
+        font-weight: 500;
+    }
+    .btn-primary-custom:hover {
+        background-color: #152c6b;
+        color: white;
+    }
+
+    .btn-outline-primary-custom {
+        border: 1px solid var(--primary-blue);
+        color: var(--primary-blue);
+        border-radius: 8px;
+        background: transparent;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+    }
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+
+    .btn-outline-danger-custom {
+        border: 1px solid var(--danger-red);
+        color: var(--danger-red);
+        border-radius: 8px;
+        background: transparent;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+    }
+    .btn-outline-danger-custom:hover {
+        background-color: var(--danger-red);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-light {
+        background-color: #F3F4F6;
+        border: 1px solid var(--border-light);
+        color: var(--text-secondary);
+        border-radius: 8px;
+    }
+    .btn-light:hover {
+        background-color: #E5E7EB;
+        color: var(--text-primary);
+    }
+    
+    .text-danger {
+        color: var(--danger-red);
+    }
+    .text-danger:hover {
+        color: #b91c1c;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0.5rem;
+    }
+    .modal-title {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 1.25rem;
+    }
+    .modal-body {
+        padding: 0.5rem 1.5rem 1.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.25rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid var(--border-light);
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        outline: none;
+    }
+    .btn-cancel {
+        background-color: #F3F4F6;
+        border: 1px solid var(--border-light);
+        color: var(--text-secondary);
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 10px 16px;
+    }
+    .btn-cancel:hover {
+        background-color: #E5E7EB;
+        color: var(--text-primary);
+    }
+    .btn-submit {
+        background-color: var(--primary-blue);
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        padding: 10px 16px;
+    }
+    .btn-submit:hover {
+        background-color: #152c6b;
+    }
+    .btn-delete {
+        background-color: var(--danger-red);
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        padding: 10px 16px;
+        text-decoration: none;
+        text-align: center;
+    }
+    .btn-delete:hover {
+        background-color: #b91c1c;
+        color: white;
+    }
+    .balance-display {
+        background-color: #f1f5f9;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        margin-bottom: 16px;
+    }
+    .balance-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .balance-amount {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        line-height: 1.2;
+    }
+    .available-balance {
+        background-color: #f8fafc;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    .status-overdue {
+        background-color: #FEE2E2;
+        border: 1px solid #F87171;
+        border-radius: 4px;
+        padding: 8px;
+        text-align: center;
+        color: #991B1B;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+    .status-due-today {
+        background-color: #FEF3C7;
+        border: 1px solid #F59E0B;
+        border-radius: 4px;
+        padding: 8px;
+        text-align: center;
+        color: #92400E;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+    .status-due-soon {
+        background-color: #FEF3C7;
+        border: 1px solid #FDE68A;
+        border-radius: 4px;
+        padding: 8px;
+        text-align: center;
+        color: #92400E;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+    .badge-custom {
+        background-color: #f1f5f9;
+        color: var(--text-secondary);
+        font-weight: 500;
+        border: 1px solid var(--border-light);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="container-fluid px-4 py-4" style="background-color: var(--bg-main); min-height: 100vh;">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold text-primary-custom mb-0">Debt & Credit Management</h3>
+            <p class="text-secondary-custom small mb-0">Manage your liabilities, loans, and credit cards effectively.</p>
+        </div>
+        <button type="button" class="btn btn-primary-custom px-4 py-2" data-bs-toggle="modal" data-bs-target="#addDebtModal">Add Debt / Credit</button>
+    </div>
+
+    {% if debts %}
+    <div class="row g-4">
+        {% for d in debts %}
+        {% set utilization = (d.balance / d.limit_amount * 100) if d.limit_amount else None %}
+
+        <div class="col-xl-4 col-lg-6">
+            <div class="thesis-card p-4 h-100 d-flex flex-column">
+
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h6 class="fw-bold text-primary-custom mb-1" style="font-size: 1.1rem;">{{ d.name }}</h6>
+                        <span class="badge-custom">{{ d.debt_type }}</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-light rounded-circle" onclick="showEditModal({{ d.id }})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" onclick="showDeleteModal('{{ url_for('debt.delete_debt', debt_id=d.id) }}')" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-secondary-custom small d-block">Current Balance</span>
+                    <span class="fw-bold fs-4 text-primary-custom">₱{{ "{:,.2f}".format(d.balance) }}</span>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    {% if d.limit_amount %}
+                    <div class="col-6">
+                        <span class="text-secondary-custom small d-block">Limit</span>
+                        <span class="fw-medium text-primary-custom small">₱{{ "{:,.2f}".format(d.limit_amount) }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="col-6">
+                        <span class="text-secondary-custom small d-block">Min. Payment</span>
+                        <span class="fw-medium text-primary-custom small">₱{{ "{:,.2f}".format(d.minimum_payment) }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-secondary-custom small d-block">Monthly Due</span>
+                        <span class="fw-medium text-primary-custom small">Day {{ d.monthly_due_date if d.monthly_due_date else 'N/A' }}</span>
+                    </div>
+                </div>
+
+                {% if utilization %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                        <span class="text-secondary-custom small">Utilization</span>
+                        <span class="fw-semibold small" style="color: {% if utilization < 30 %}var(--success-green){% elif utilization < 60 %}var(--warning-amber){% else %}var(--danger-red){% endif %};">{{ utilization|round(1) }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px; border-radius: 10px; background-color: #f1f5f9;">
+                        <div class="progress-bar" role="progressbar"
+                             style="width: {{ utilization }}%; border-radius: 10px; transition: width 0.5s ease; background-color: {% if utilization < 30 %}var(--success-green){% elif utilization < 60 %}var(--warning-amber){% else %}var(--danger-red){% endif %};">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if d.is_loan %}
+                <div class="mt-2 mb-3 pt-3" style="border-top: 1px solid var(--border-light);">
+                    <small class="fw-semibold text-secondary-custom d-block mb-2 text-uppercase" style="letter-spacing: 0.5px; font-size: 0.75rem;">Loan Details</small>
+                    {% if d.loan_start_date and d.loan_end_date %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-secondary-custom small">Term</span>
+                        <span class="fw-medium text-primary-custom small">{{ d.loan_start_date.strftime('%b %Y') }} - {{ d.loan_end_date.strftime('%b %Y') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-secondary-custom small">Duration</span>
+                        <span class="fw-medium text-primary-custom small">{{ d.loan_duration_months }} mos</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% set status = d.due_status %}
+                {% if status and status.status != 'SAFE' %}
+                    {% if status.status == 'OVERDUE' %}
+                    <div class="status-overdue">
+                        OVERDUE ({{ status.days }} days)
+                    </div>
+                    {% elif status.status == 'DUE TODAY' %}
+                    <div class="status-due-today">
+                        DUE TODAY
+                    </div>
+                    {% elif status.status == 'DUE SOON' %}
+                    <div class="status-due-soon">
+                        Payment Due Soon (in {{ status.days }} days)
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <div class="mt-auto pt-3 border-top" style="border-color: var(--border-light) !important;">
+                    <button type="button" class="btn btn-primary-custom w-100 py-2" data-bs-toggle="modal" data-bs-target="#paymentModal{{ d.id }}">Make Payment</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Payment Modal for {{ d.name }} -->
+        <div class="modal fade" id="paymentModal{{ d.id }}" tabindex="-1" aria-labelledby="paymentModalLabel{{ d.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="paymentModalLabel{{ d.id }}">Make a Payment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-secondary-custom small mb-4">Record a payment for {{ d.name }}</p>
+                        
+                        <div class="balance-display">
+                            <div class="balance-label">CURRENT BALANCE</div>
+                            <div class="balance-amount">P{{ "{:,.2f}".format(d.balance) }}</div>
+                        </div>
+
+                        <div class="available-balance">
+                            <span class="fw-semibold" style="color: var(--text-primary);">Available Balance</span>
+                            <span class="fw-bold" style="color: var(--success-green);">P{{ "{:,.2f}".format(user.total_balance) }}</span>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('debt.pay', debt_id=d.id) }}">
+                            <input type="hidden" name="funding_source" value="balance">
+                            <input type="hidden" name="income_source" value="0">
+
+                            <div class="mb-4">
+                                <label class="form-label">Payment Amount (P)</label>
+                                <input type="number" step="0.01" min="0.01" max="{{ user.total_balance }}" name="amount" class="form-control fw-bold" style="color: var(--success-green);" placeholder="0.00" required>
+                                <div class="text-secondary-custom small text-center mt-2">This will be deducted from your main balance</div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-cancel flex-fill" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-submit flex-fill">Submit Payment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-3">
+            <i class="fas fa-credit-card fa-3x text-secondary-custom opacity-50"></i>
+        </div>
+        <h5 class="fw-bold text-primary-custom mb-2">No debts or credit cards added yet</h5>
+        <p class="text-secondary-custom small mb-4">Start by adding your first liability.</p>
+        <button type="button" class="btn btn-primary-custom px-4 py-2" data-bs-toggle="modal" data-bs-target="#addDebtModal">Add Debt / Credit</button>
+    </div>
+    {% endif %}
+
+    <!-- Add Debt/Credit Modal -->
+    <div class="modal fade" id="addDebtModal" tabindex="-1" aria-labelledby="addDebtModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDebtModalLabel">Add Liability</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('debt.add') }}" id="addDebtForm">
+                        <div class="mb-3">
+                            <label class="form-label">Account Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g., Chase Sapphire, Car Loan" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select name="debt_type" class="form-select" id="debtTypeSelect" required>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Loan">Loan</option>
+                                <option value="Debt">Debt</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Balance (₱)</label>
+                            <input type="number" step="0.01" min="0" name="balance" class="form-control" placeholder="0.00" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Minimum Payment (₱)</label>
+                            <input type="number" step="0.01" min="0" name="minimum_payment" class="form-control" placeholder="0.00" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Monthly Due Day (1-31)</label>
+                            <input type="number" min="1" max="31" name="monthly_due_date" class="form-control" placeholder="e.g., 15" required>
+                        </div>
+
+                        <div class="mb-3" id="creditLimitField">
+                            <label class="form-label">Credit Limit (₱)</label>
+                            <input type="number" step="0.01" min="0" name="limit_amount" class="form-control" placeholder="0.00">
+                        </div>
+
+                        <div class="mb-3" id="loanDates" style="display: none;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" name="loan_start_date" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" name="loan_end_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-cancel flex-fill" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-submit flex-fill">Save Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Debt/Credit Modal -->
+    <div class="modal fade" id="editDebtModal" tabindex="-1" aria-labelledby="editDebtModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDebtModalLabel">Edit Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" id="editDebtForm">
+                        <div class="mb-3">
+                            <label class="form-label">Account Name</label>
+                            <input type="text" name="name" id="edit_name" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select" id="edit_debt_type" required>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Loan">Loan</option>
+                                <option value="Debt">Debt</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Balance (₱)</label>
+                            <input type="number" step="0.01" min="0" name="balance" id="edit_balance" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Minimum Payment (₱)</label>
+                            <input type="number" step="0.01" min="0" name="minimum_payment" id="edit_minimum_payment" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Monthly Due Day (1-31)</label>
+                            <input type="number" min="1" max="31" name="monthly_due_date" id="edit_monthly_due_date" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3" id="edit_creditLimitField">
+                            <label class="form-label">Credit Limit (₱)</label>
+                            <input type="number" step="0.01" min="0" name="limit" id="edit_limit" class="form-control">
+                        </div>
+
+                        <div class="mb-3" id="edit_loanDates" style="display: none;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" name="loan_start_date" id="edit_loan_start_date" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" name="loan_end_date" id="edit_loan_end_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-cancel flex-fill" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-submit flex-fill">Update Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" style="color: var(--text-primary);">Delete this account?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary-custom mb-4">Are you sure you want to delete this account? This action cannot be undone.</p>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-cancel flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <a href="#" id="confirmDeleteBtn" class="btn btn-delete flex-fill">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEditModal(debtId) {
+            console.log('Edit button clicked for debt ID:', debtId);
+            
+            fetch('/debt/edit/' + debtId)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Received data:', data);
+                    
+                    document.getElementById('edit_name').value = data.name;
+                    document.getElementById('edit_debt_type').value = data.debt_type;
+                    document.getElementById('edit_balance').value = data.balance;
+                    document.getElementById('edit_minimum_payment').value = data.minimum_payment;
+                    document.getElementById('edit_monthly_due_date').value = data.monthly_due_date;
+                    document.getElementById('edit_limit').value = data.limit_amount || '';
+                    document.getElementById('edit_loan_start_date').value = data.loan_start_date || '';
+                    document.getElementById('edit_loan_end_date').value = data.loan_end_date || '';
+                    
+                    document.getElementById('editDebtForm').action = '/debt/edit/' + debtId;
+                    
+                    const event = new Event('change');
+                    document.getElementById('edit_debt_type').dispatchEvent(event);
+                    
+                    const editModal = new bootstrap.Modal(document.getElementById('editDebtModal'));
+                    editModal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load debt data');
+                });
+        }
+
+        function showDeleteModal(deleteUrl) {
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+            deleteModal.show();
+        }
+
+        // Add modal field toggling
+        document.addEventListener('DOMContentLoaded', function() {
+            const debtTypeSelect = document.getElementById('debtTypeSelect');
+            const creditLimitField = document.getElementById('creditLimitField');
+            const loanDates = document.getElementById('loanDates');
+
+            function toggleFields() {
+                const selectedType = debtTypeSelect.value;
+
+                if (selectedType === 'Credit Card') {
+                    creditLimitField.style.display = 'block';
+                    loanDates.style.display = 'none';
+                } else if (selectedType === 'Loan') {
+                    creditLimitField.style.display = 'none';
+                    loanDates.style.display = 'block';
+                } else {
+                    creditLimitField.style.display = 'none';
+                    loanDates.style.display = 'none';
+                }
+            }
+
+            if (debtTypeSelect) {
+                debtTypeSelect.addEventListener('change', toggleFields);
+                toggleFields();
+            }
+            
+            // Edit modal field toggling
+            const editDebtTypeSelect = document.getElementById('edit_debt_type');
+            const editCreditLimitField = document.getElementById('edit_creditLimitField');
+            const editLoanDates = document.getElementById('edit_loanDates');
+            
+            if (editDebtTypeSelect) {
+                editDebtTypeSelect.addEventListener('change', function() {
+                    const selectedType = this.value;
+                    
+                    if (selectedType === 'Credit Card') {
+                        editCreditLimitField.style.display = 'block';
+                        editLoanDates.style.display = 'none';
+                    } else if (selectedType === 'Loan') {
+                        editCreditLimitField.style.display = 'none';
+                        editLoanDates.style.display = 'block';
+                    } else {
+                        editCreditLimitField.style.display = 'none';
+                        editLoanDates.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+
+</div>
+{% endblock %}

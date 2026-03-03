@@ -1,0 +1,84 @@
+﻿{% extends "base.html" %}
+{% block title %}Create New Budget{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('budget.index') }}" class="btn btn-sm btn-light rounded-circle me-3" style="color: var(--text-secondary);">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h4 mb-0 fw-bold" style="color: var(--text-primary);">Setup a New Budget</h1>
+                </div>
+            </div>
+
+            <div class="thesis-card p-4 p-sm-5">
+                <form method="POST" action="{{ url_for('budget.add') }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-4">
+                        <label for="{{ form.name.id }}" class="form-label fw-semibold small text-muted">Budget Name</label>
+                        {{ form.name(class="form-control shadow-none", placeholder="e.g., Weekly Allowance, Monthly Food", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                        {% for error in form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.amount.id }}" class="form-label fw-semibold small text-muted">Total Budget Amount (₱)</label>
+                            {{ form.amount(class="form-control shadow-none fw-bold", placeholder="0.00", style="border-radius: 8px; border-color: var(--border-light); color: var(--primary-blue);", required=true) }}
+                            {% for error in form.amount.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.funding_source.id }}" class="form-label fw-semibold small text-muted">Funding Source</label>
+                            {{ form.funding_source(class="form-select shadow-none", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                            <div class="form-text" style="font-size: 0.75rem;">{{ form.funding_source.description }}</div>
+                            {% for error in form.funding_source.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.start_date.id }}" class="form-label fw-semibold small text-muted">Start Date</label>
+                            {{ form.start_date(class="form-control shadow-none", type="date", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                            {% for error in form.start_date.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.end_date.id }}" class="form-label fw-semibold small text-muted">End Date</label>
+                            {{ form.end_date(class="form-control shadow-none", type="date", style="border-radius: 8px; border-color: var(--border-light);", required=true) }}
+                            {% for error in form.end_date.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="{{ form.description.id }}" class="form-label fw-semibold small text-muted">Description (Optional)</label>
+                        {{ form.description(class="form-control shadow-none", rows="3", placeholder="Goals or notes for this budget period...", style="border-radius: 8px; border-color: var(--border-light);") }}
+                    </div>
+
+                    <hr style="border-color: var(--border-light);">
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('budget.index') }}" class="btn btn-light border-0" style="border-radius: 8px; color: var(--text-secondary);">Cancel</a>
+                        <button type="submit" class="btn text-white px-4" style="background-color: var(--primary-blue); border-radius: 8px;">
+                            <i class="fas fa-save me-2"></i> Save Budget
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

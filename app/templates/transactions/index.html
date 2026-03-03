@@ -1,0 +1,407 @@
+﻿{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    :root {
+        --primary-blue: #1E3A8A;
+        --success-green: #10B981;
+        --danger-red: #EF4444;
+        --warning-amber: #F59E0B;
+        --border-light: #E5E7EB;
+        --bg-main: #F8FAFC;
+        --bg-card: #FFFFFF;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+    }
+    body { background-color: var(--bg-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
+    .btn { border-radius: 8px; font-weight: 500; font-size: 0.875rem; padding: 10px 16px; transition: background-color 0.2s; }
+    .btn-primary { background-color: var(--primary-blue); border-color: var(--primary-blue); color: #fff; }
+    .btn-primary:hover { background-color: #152C6B; border-color: #152C6B; }
+    .btn-success { background-color: var(--success-green); border-color: var(--success-green); color: #fff; }
+    .btn-success:hover { background-color: #0D946D; border-color: #0D946D; }
+    .btn-custom-action { background-color: #6366F1; border-color: #6366F1; color: #fff; }
+    .btn-custom-action:hover { background-color: #4F46E5; border-color: #4F46E5; color: #fff; }
+    .btn-light { background-color: #F3F4F6; border-color: #F3F4F6; color: var(--text-secondary); }
+    .btn-light:hover { background-color: #E5E7EB; color: var(--text-primary); }
+    .btn-check:focus + .btn, .btn:focus { box-shadow: none; outline: none; }
+    .thesis-card { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-light); }
+    .badge { padding: 4px 8px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; }
+    .badge-soft-success { background-color: #ECFDF5; color: var(--success-green); border: 1px solid #A7F3D0; }
+    .badge-soft-danger { background-color: #FEF2F2; color: var(--danger-red); border: 1px solid #FECACA; }
+    .badge-soft-warning { background-color: #FFFBEB; color: var(--warning-amber); border: 1px solid #FDE68A; }
+    .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .modal-content { border-radius: 12px; border: none; }
+    .modal-title { font-weight: 700; color: var(--text-primary); }
+    .form-label { font-weight: 500; font-size: 0.875rem; color: var(--text-secondary); }
+    .form-control, .form-select { border-radius: 8px; font-size: 0.875rem; padding: 10px 12px; }
+    .form-control:focus, .form-select:focus { border-color: #93C5FD; box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.2); }
+    .modal-body p { font-size: 0.875rem; color: var(--text-secondary); }
+    .fc-daygrid-event, .fc-timegrid-event { padding: 2px 4px; border: none; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-decoration: none !important; color: white !important; }
+    .fc-list-event-title, .fc-list-event-title a { color: var(--text-primary) !important; font-weight: 500; text-decoration: none; cursor: pointer; }
+    .fc-list-event-time { color: var(--text-secondary) !important; cursor: pointer; }
+    .fc-list-day-cushion { background-color: #F3F4F6 !important; color: var(--text-primary) !important; font-weight: 600 !important; }
+    .planned-event { border-left: 4px solid rgba(0,0,0,0.3) !important; opacity: 0.95; }
+    .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
+    .fc .fc-button-primary { background-color: var(--primary-blue); border-color: var(--primary-blue); border-radius: 6px; text-transform: capitalize; }
+    .fc .fc-button-primary:hover { background-color: #152C6B; border-color: #152C6B; }
+    .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+    .fc-col-header-cell-cushion { color: var(--text-secondary); text-decoration: none; font-weight: 600; }
+    .fc-daygrid-day-number { color: var(--text-primary); text-decoration: none; font-weight: 500; padding: 6px; }
+    /* Placeholder style for select options */
+    select option:first-child { color: #999; }
+    select:invalid { color: #999; }
+    select option { color: var(--text-primary); }
+    select option:first-child { color: #999; }
+    .text-danger-small { font-size: 0.8rem; margin-top: 4px; }
+</style>
+
+<div class="container-fluid px-2 px-md-4 py-4">
+    <div class="mb-4">
+        <h1 class="h3 mb-1 fw-bold">Transactions</h1>
+        <p class="text-muted small mb-0">Unified financial tracking.</p>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3 gap-2 flex-wrap">
+        <button class="btn btn-custom-action" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+            <i class="fas fa-plus me-2"></i>Add Transaction
+        </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+            <i class="fas fa-calendar-plus me-2"></i>Add Plan
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-5" style="border-radius: 12px;">
+        <div class="card-body p-2 p-md-4">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center mb-4 gap-2">
+        <div>
+            <h2 class="h4 mb-1 fw-bold">Transaction History</h2>
+            <p class="text-muted small mb-0">Manage and track your financial records.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <span class="small fw-bold text-uppercase" style="color: var(--text-secondary);">Guide:</span>
+            <div class="d-flex align-items-center"><span class="legend-dot" style="background-color: var(--success-green);"></span><span class="small text-muted">Income</span></div>
+            <div class="d-flex align-items-center"><span class="legend-dot" style="background-color: var(--danger-red);"></span><span class="small text-muted">Expense</span></div>
+            <div class="d-flex align-items-center"><span class="legend-dot" style="background-color: var(--warning-amber);"></span><span class="small text-muted">Debt Payments</span></div>
+        </div>
+    </div>
+
+    <div class="thesis-card p-0 overflow-hidden mb-4 shadow-sm">
+        <div class="card-body p-0">
+            {% if transactions %}
+            <table class="table mobile-cards-table mb-0 align-middle" id="transactionsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small fw-semibold border-0 py-3">Date</th>
+                        <th class="text-muted small fw-semibold border-0 py-3">Type</th>
+                        <th class="text-muted small fw-semibold border-0 py-3">Category</th>
+                        <th class="text-muted small fw-semibold border-0 py-3">Amount</th>
+                        <th class="pe-4 text-center text-muted small fw-semibold border-0 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr class="border-bottom">
+                        <td data-label="Date" class="ps-4 text-muted small">{{ t.date.strftime("%b %d, %Y") }}</td>
+                        <td data-label="Type">
+                            <span class="badge {% if t.type == 'Income' %} badge-soft-success {% else %} badge-soft-danger {% endif %}">
+                                {{ t.type }}
+                            </span>
+                        </td>
+                        <td data-label="Category" class="fw-medium text-dark">{{ t.category }}</td>
+                        <td data-label="Amount" class="text-end fw-bold">₱{{ t.amount | round(2) }}</td>
+                        <td data-label="Actions" class="pe-4 text-center">
+                            <a href="{{ url_for('transactions.edit', transaction_id=t.id) }}" class="btn btn-sm btn-light rounded-circle" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ t.id }}" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-receipt fa-2x text-primary"></i>
+                </div>
+                <h5 class="fw-bold">No transactions yet</h5>
+                <p class="text-muted small mb-4">Record your first income or expense to start tracking.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                    Add Your First Transaction
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title" id="addTransactionModalLabel">Record a Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <form method="POST" action="{{ url_for('transactions.add') }}" id="transactionForm">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="txnType" class="form-label">Type</label>
+                            <select id="txnType" name="type" class="form-select" required>
+                                <option value="" selected disabled>-- Select Type --</option>
+                                {% for val, label in form.type.choices %}
+                                    {% if val %} {# Skip the empty placeholder #}
+                                    <option value="{{ val }}">{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="txnAmount" class="form-label">Amount (₱)</label>
+                            <input type="number" id="txnAmount" step="0.01" min="0" name="amount" class="form-control" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="txnCategory" class="form-label">Category</label>
+                            <select id="txnCategory" name="category" class="form-select" required>
+                                <option value="" selected disabled>-- Select a Category --</option>
+                                {% for val, label in form.category.choices %}
+                                    {% if val %} {# Skip the empty placeholder #}
+                                    <option value="{{ val }}">{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="txnDate" class="form-label">Date</label>
+                            <input type="date" id="txnDate" name="date" class="form-control" value="{{ form.date.data.strftime('%Y-%m-%d') if form.date.data else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txnDeductFrom" class="form-label">Funding Source</label>
+                        <select id="txnDeductFrom" name="deduct_from" class="form-select">
+                            <option value="" selected disabled>-- Select Funding Source --</option>
+                            {% for val, label in form.deduct_from.choices %}
+                                {% if val %} {# Skip the empty placeholder #}
+                                <option value="{{ val }}">{{ label }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3 p-3 bg-light rounded" id="budgetSelectContainer" style="display: none;">
+                        <label for="txnBudget" class="form-label text-primary fw-bold"><i class="fas fa-wallet me-1"></i>Select Specific Budget</label>
+                        <select id="txnBudget" name="budget_id" class="form-select border-primary shadow-sm">
+                            <option value="" disabled selected>-- Choose an Active Budget --</option>
+                            {% if active_budgets %}
+                                {% for b in active_budgets %}
+                                    <option value="{{ b.id }}">
+                                        {% if b.category %}{{ b.category }}{% elif b.name %}{{ b.name }}{% else %}Budget ID: {{ b.id }}{% endif %}
+                                        {% if b.balance is defined %} (Balance: ₱{{ b.balance }}){% elif b.amount %} (₱{{ b.amount }}){% endif %}
+                                    </option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="" disabled>No active budgets available.</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="txnDescription" class="form-label">Description (Optional)</label>
+                        <textarea id="txnDescription" name="description" class="form-control" rows="2" placeholder="Brief note..."></textarea>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-custom-action w-100" id="submitBtn">Save Transaction</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title text-danger">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this transaction?</div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form id="delete-form" method="POST" action="">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addPlanModal" tabindex="-1" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title" id="addPlanModalLabel">Schedule a Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="mb-4">Adding plans helps our system forecast your future budget accurately.</p>
+                <form method="POST" action="{{ url_for('transactions.add_plan') }}" id="planForm">
+                    <div class="mb-3">
+                        <label for="planTitle" class="form-label">Plan Name / Event</label>
+                        <input type="text" id="planTitle" name="title" class="form-control" placeholder="e.g., Car Insurance, Bonus" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="planType" class="form-label">Type</label>
+                            <select id="planType" name="plan_type" class="form-select" required>
+                                <option value="" selected disabled>-- Select Type --</option>
+                                <option value="Expected Expense">Expected Expense</option>
+                                <option value="Expected Income">Expected Income</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="planAmount" class="form-label">Amount (₱)</label>
+                            <input type="number" id="planAmount" step="0.01" min="0" name="amount" class="form-control" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="planDate" class="form-label">Date</label>
+                        <input type="date" id="planDate" name="date" class="form-control" required>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary w-100">Save Plan to Calendar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title">Event Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center pt-2 pb-4">
+                <h4 id="modalEventTitle" class="fw-bold mb-1"></h4>
+                <p id="modalEventDate" class="text-secondary mb-3 small"></p>
+                <div id="modalEventCategory" class="badge bg-light text-dark px-3 py-2 border rounded-pill small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Delete modal functionality
+        const deleteModal = document.getElementById('deleteModal');
+        if(deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const transactionId = button.getAttribute('data-id');
+                const deleteForm = document.getElementById('delete-form');
+                deleteForm.action = '{{ url_for("transactions.delete", transaction_id=0) }}'.replace('0', transactionId);
+            });
+        }
+
+        // Budget Dropdown Toggle Logic
+        const deductFromSelect = document.getElementById('txnDeductFrom');
+        const budgetContainer = document.getElementById('budgetSelectContainer');
+        const budgetSelect = document.getElementById('txnBudget');
+
+        if (deductFromSelect && budgetContainer && budgetSelect) {
+            deductFromSelect.addEventListener('change', function() {
+                if (this.value === 'budget') {
+                    budgetContainer.style.display = 'block';
+                    budgetSelect.setAttribute('required', 'required');
+                } else {
+                    budgetContainer.style.display = 'none';
+                    budgetSelect.removeAttribute('required');
+                }
+            });
+        }
+
+        // Form validation to ensure placeholder options aren't selected
+        const transactionForm = document.getElementById('transactionForm');
+        if (transactionForm) {
+            transactionForm.addEventListener('submit', function(e) {
+                const typeSelect = document.getElementById('txnType');
+                const categorySelect = document.getElementById('txnCategory');
+                
+                if (typeSelect.value === '') {
+                    e.preventDefault();
+                    alert('Please select a transaction type');
+                    return false;
+                }
+                
+                if (categorySelect.value === '') {
+                    e.preventDefault();
+                    alert('Please select a category');
+                    return false;
+                }
+            });
+        }
+
+        const planForm = document.getElementById('planForm');
+        if (planForm) {
+            planForm.addEventListener('submit', function(e) {
+                const planTypeSelect = document.getElementById('planType');
+                
+                if (planTypeSelect.value === '') {
+                    e.preventDefault();
+                    alert('Please select a plan type');
+                    return false;
+                }
+            });
+        }
+
+        /* FullCalendar Logic */
+        let calendarEl = document.getElementById("calendar");
+        if (calendarEl) {
+            let calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: window.innerWidth < 768 ? "listWeek" : "dayGridMonth",
+                events: "{{ url_for('transactions.events') }}",
+                buttonText: { dayGridMonth: 'Month', listWeek: 'List' },
+                headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,listWeek" },
+                eventClick: function(info) {
+                    document.getElementById('modalEventTitle').innerText = info.event.title;
+                    document.getElementById('modalEventCategory').innerText = info.event.extendedProps.type || 'Calendar Event';
+                    let eventDate = new Date(info.event.start);
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    document.getElementById('modalEventDate').innerText = eventDate.toLocaleDateString('en-US', options);
+                    let eventModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+                    eventModal.show();
+                },
+                windowResize: function(arg) {
+                    if (window.innerWidth < 768) {
+                        if (arg.view.type !== 'listWeek') calendar.changeView('listWeek');
+                    } else {
+                        if (arg.view.type === 'listWeek') calendar.changeView('dayGridMonth');
+                    }
+                }
+            });
+            calendar.render();
+        }
+    });
+</script>
+{% endblock %}
