@@ -20,8 +20,9 @@ class Config:
     if database_url and database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     
-    # Add pg8000 driver explicitly for PostgreSQL
+    # Use pg8000 as the driver for PostgreSQL
     if database_url and 'postgresql' in database_url:
+        # Add pg8000 as the driver
         if '?' in database_url:
             database_url += '&driver=pg8000'
         else:
