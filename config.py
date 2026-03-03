@@ -18,15 +18,7 @@ class Config:
     
     # Fix for Render's postgres:// vs SQLAlchemy's postgresql://
     if database_url and database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    
-    # Use pg8000 as the driver for PostgreSQL
-    if database_url and 'postgresql' in database_url:
-        # Add pg8000 as the driver
-        if '?' in database_url:
-            database_url += '&driver=pg8000'
-        else:
-            database_url += '?driver=pg8000'
+        database_url = database_url.replace('postgres://', 'postgresql+pg8000://', 1)
     
     SQLALCHEMY_DATABASE_URI = database_url or f"sqlite:///{BASE_DIR / 'finance.db'}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
