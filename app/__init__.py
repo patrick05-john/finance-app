@@ -71,5 +71,10 @@ def create_app():
     @app.context_processor
     def inject_now():
         return {'now': datetime.datetime.now}
+	
+	    # Create database tables if they don't exist
+    with app.app_context():
+        db.create_all()
+        print("Database tables created/verified")
 
     return app
