@@ -7,81 +7,175 @@
 
 <style>
     /* Google Keep Style Notes CSS */
-    .keep-note-input-container {
-        background: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-        transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1);
+    .keep-note-input-container { 
+        background: #ffffff; 
+        border-radius: 8px; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); 
+        transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1); 
     }
-    .keep-note-input-container:focus-within {
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    .keep-note-input-container:focus-within { 
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); 
     }
-    .keep-note-card {
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        position: relative;
-        transition: all 0.2s ease-in-out;
+    .keep-note-card { 
+        background: #ffffff; 
+        border: 1px solid #e0e0e0; 
+        border-radius: 8px; 
+        position: relative; 
+        transition: all 0.2s ease-in-out; 
+        cursor: pointer; 
     }
-    .keep-note-card:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    .keep-note-card:hover { 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
     }
-    .note-actions {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        opacity: 0;
-        transition: opacity 0.2s;
+    .note-actions { 
+        position: absolute; 
+        bottom: 8px; 
+        right: 8px; 
+        opacity: 0; 
+        transition: opacity 0.2s; 
     }
-    .keep-note-card:hover .note-actions {
-        opacity: 1;
+    .keep-note-card:hover .note-actions { 
+        opacity: 1; 
+    }
+    .note-item p { 
+        margin: 0;
     }
 
-    /* Calendar Responsive Tweaks */
-    .fc { font-size: 0.85rem; }
-    .fc-event-title { white-space: normal !important; overflow: hidden; }
-    .fc-daygrid-event, .fc-timegrid-event { padding: 2px 4px; border: none; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-decoration: none !important; color: white !important; }
-    .fc-list-event-title, .fc-list-event-title a { color: var(--text-primary) !important; font-weight: 500; text-decoration: none; cursor: pointer; }
-    .fc-list-event-time { color: var(--text-secondary) !important; cursor: pointer; }
-    .fc-list-day-cushion { background-color: #F3F4F6 !important; color: var(--text-primary) !important; font-weight: 600 !important; }
-    .planned-event { border-left: 4px solid rgba(0,0,0,0.3) !important; opacity: 0.95; }
-    .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
-    .fc .fc-button-primary { background-color: var(--primary-blue); border-color: var(--primary-blue); border-radius: 6px; text-transform: capitalize; }
-    .fc .fc-button-primary:hover { background-color: #152C6B; border-color: #152C6B; }
-    .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
-    .fc-col-header-cell-cushion { color: var(--text-secondary); text-decoration: none; font-weight: 600; }
-    .fc-daygrid-day-number { color: var(--text-primary); text-decoration: none; font-weight: 500; padding: 6px; }
+    /* Calendar Styling */
+    .fc { 
+        font-size: 0.85rem; 
+    }
+    .fc-event { 
+        border: none !important; 
+        border-radius: 4px !important; 
+        margin-bottom: 2px !important; 
+    }
+    .fc-event-title { 
+        white-space: normal !important; 
+        overflow: hidden; 
+        font-weight: 700 !important; 
+        padding: 1px 4px; 
+        color: #fff; 
+    }
+    .fc-daygrid-event { 
+        cursor: pointer; 
+    }
+    .fc-theme-standard td, .fc-theme-standard th { 
+        border-color: var(--border-light); 
+    }
+    .fc .fc-button-primary { 
+        background-color: var(--primary-blue); 
+        border-color: var(--primary-blue); 
+        border-radius: 6px; 
+        text-transform: capitalize; 
+    }
+    .fc .fc-button-primary:hover { 
+        background-color: #152C6B; 
+        border-color: #152C6B; 
+    }
+    .fc .fc-toolbar-title { 
+        font-size: 1.25rem; 
+        font-weight: 700; 
+        color: var(--text-primary); 
+    }
 
-    /* Button styles */
-    .btn-custom-action { background-color: #6366F1; border-color: #6366F1; color: #fff; }
-    .btn-custom-action:hover { background-color: #4F46E5; border-color: #4F46E5; color: #fff; }
-    .btn-primary { background-color: var(--primary-blue); border-color: var(--primary-blue); color: #fff; }
-    .btn-primary:hover { background-color: #152C6B; border-color: #152C6B; }
+    /* Guide indicator styling */
+    .legend-indicator { 
+        width: 14px; 
+        height: 14px; 
+        border-radius: 4px; 
+    }
+    .legend-text { 
+        font-size: 0.85rem; 
+        color: var(--text-secondary); 
+        font-weight: 600;
+    }
 
-    /* Form styles */
-    .modal-content { border-radius: 12px; border: none; }
-    .modal-title { font-weight: 700; color: var(--text-primary); }
-    .form-label { font-weight: 500; font-size: 0.875rem; color: var(--text-secondary); }
-    .form-control, .form-select { border-radius: 8px; font-size: 0.875rem; padding: 10px 12px; }
-    .form-control:focus, .form-select:focus { border-color: #93C5FD; box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.2); }
-    select option:first-child { color: #999; }
-    select:invalid { color: #999; }
-    select option { color: var(--text-primary); }
+    /* Form and Button styles */
+    .btn-custom-action { 
+        background-color: #6366F1; 
+        border-color: #6366F1; 
+        color: #fff; 
+    }
+    .btn-custom-action:hover { 
+        background-color: #4F46E5; 
+        border-color: #4F46E5; 
+        color: #fff; 
+    }
+    .btn-primary { 
+        background-color: var(--primary-blue); 
+        border-color: var(--primary-blue); 
+        color: #fff; 
+    }
+    .btn-primary:hover { 
+        background-color: #152C6B; 
+        border-color: #152C6B; 
+    }
+    .modal-content { 
+        border-radius: 12px; 
+        border: none; 
+    }
+    .modal-title { 
+        font-weight: 700; 
+        color: var(--text-primary); 
+    }
+    .form-label { 
+        font-weight: 500; 
+        font-size: 0.875rem; 
+        color: var(--text-secondary); 
+    }
+    .form-control, .form-select { 
+        border-radius: 8px; 
+        font-size: 0.875rem; 
+        padding: 10px 12px; 
+    }
+    .form-control:focus, .form-select:focus { 
+        border-color: #93C5FD; 
+        box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.2); 
+    }
+    .input-group-text { 
+        background: #F3F4F6; 
+        border: 1px solid #ced4da; 
+        border-radius: 8px 0 0 8px; 
+    }
+    .input-group .form-control { 
+        border-radius: 0 8px 8px 0; 
+    }
+
+    /* Mobile Overrides */
+    @media (max-width: 576px) {
+        .container-fluid { padding-left: 1rem !important; padding-right: 1rem !important; }
+        .h3 { font-size: 1.4rem !important; margin-bottom: 0.25rem !important; }
+        .row.g-3.g-md-4 { --bs-gutter-x: 0.75rem !important; --bs-gutter-y: 0.75rem !important; }
+        .thesis-card { padding: 1.25rem !important; border-radius: 10px !important; }
+        .kpi-card .h3 { font-size: 1.6rem !important; margin-top: 0.25rem !important;}
+        .kpi-card .small { font-size: 0.7rem !important; }
+        .kpi-card .icon-bg-primary, .kpi-card .icon-bg-success, .kpi-card .icon-bg-danger, .kpi-card .icon-bg-warning { 
+            width: 42px !important; height: 42px !important; padding: 0.75rem !important;
+        }
+        .kpi-card i.fa-lg { font-size: 1rem !important; }
+        .color-guide-card { padding: 1rem !important; margin-bottom: 1rem !important;}
+        .color-guide-card .legend-text { font-size: 0.75rem !important; }
+        #notesGrid { gap: 0.5rem !important; }
+        .keep-note-card { padding: 1rem !important; }
+        .keep-note-card h6 { font-size: 0.9rem !important; }
+        .keep-note-card p { font-size: 0.8rem !important; margin-bottom: 0.75rem !important;}
+    }
 </style>
 
 <div class="container-fluid px-4 py-4">
-
-    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between mb-4 gap-3">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between mb-3 mb-md-4 gap-2 gap-sm-3">
         <div class="d-flex align-items-center gap-3">
             <h1 class="h3 mb-0 fw-bold" style="color: var(--text-primary);">Dashboard Analytics</h1>
             <button id="privacyToggleBtn" class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Toggle Privacy">
                 <i class="fas fa-eye" id="privacyIcon"></i>
             </button>
         </div>
+        <div><p class="text-muted small mb-0">Financial summary & planning calendar.</p></div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 g-md-4 mb-4">
+        <div class="col">
             <div class="thesis-card kpi-card h-100 p-3" style="border-bottom: 4px solid var(--primary-blue);">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -94,12 +188,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col">
             <div class="thesis-card kpi-card h-100 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="small fw-semibold text-uppercase d-flex align-items-center gap-2" style="color: var(--text-secondary);">
-                            Total Income <span class="badge badge-soft-neutral px-2 py-1" style="font-size: 0.65rem; text-transform: none;">This Month</span>
+                            Monthly Income <span class="badge badge-soft-neutral px-2 py-1" style="font-size: 0.65rem; text-transform: none;">This Month</span>
                         </div>
                         <div class="h3 mb-0 fw-bold mt-1 privacy-amount" data-original-amount="₱{{ total_income }}" style="color: var(--success-green);">₱{{ total_income }}</div>
                     </div>
@@ -107,12 +201,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col">
             <div class="thesis-card kpi-card h-100 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="small fw-semibold text-uppercase d-flex align-items-center gap-2" style="color: var(--text-secondary);">
-                            Total Expenses <span class="badge badge-soft-neutral px-2 py-1" style="font-size: 0.65rem; text-transform: none;">This Month</span>
+                            Monthly Expenses <span class="badge badge-soft-neutral px-2 py-1" style="font-size: 0.65rem; text-transform: none;">This Month</span>
                         </div>
                         <div class="h3 mb-0 fw-bold mt-1 privacy-amount" data-original-amount="₱{{ total_expenses }}" style="color: var(--danger-red);">₱{{ total_expenses }}</div>
                     </div>
@@ -120,7 +214,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col">
             <div class="thesis-card kpi-card h-100 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -136,89 +230,53 @@
     </div>
 
     <div class="row g-4 mb-4">
-
-        <div class="col-lg-7 col-xl-8 order-1 d-flex flex-column gap-4">
+        
+        <div class="col-lg-7 col-xl-8 d-flex flex-column gap-4">
+            
             <div class="thesis-card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Transactions Calendar</h6>
-                    <div class="d-flex gap-2">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Financial Calendar</h6>
+                    <div class="d-flex gap-2 ms-auto">
                         <button class="btn btn-custom-action btn-sm" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-                            <i class="fas fa-plus me-2"></i>Add Transaction
+                            <i class="fas fa-plus me-2"></i>Record Transaction
                         </button>
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPlanModal">
-                            <i class="fas fa-calendar-plus me-2"></i>Add Plan
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule Plan/Dues
                         </button>
                     </div>
                 </div>
+
+                <div class="thesis-card bg-light border p-3 color-guide-card mb-4 rounded-3 shadow-none">
+                    <div class="mb-2"><small class="text-uppercase fw-bold text-muted" style="font-size: 0.75rem;">Legend:</small></div>
+                    <div class="d-flex flex-wrap gap-4 align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="legend-indicator" style="background-color: #16A34A;"></div><span class="legend-text">Actual Income</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="legend-indicator" style="background-color: #DC2626;"></div><span class="legend-text">Actual Expense</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="legend-indicator" style="background-color: #3B82F6;"></div><span class="legend-text">Planned Income</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="legend-indicator" style="background-color: #F59E0B;"></div><span class="legend-text">Planned Dues</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="legend-indicator" style="background-color: #8B5CF6; border-left: 3px solid rgba(0,0,0,0.3);"></div><span class="legend-text">Recurring Bill</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="calendar"></div>
             </div>
-        </div>
 
-        <div class="col-lg-5 col-xl-4 order-2 d-flex flex-column gap-4">
-
-            <div class="thesis-card p-4 d-flex flex-column" style="max-height: 350px;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Upcoming Due Dates</h6>
-                    <i class="fas fa-bell" style="color: var(--warning-amber);"></i>
-                </div>
-                <div class="reminder-list flex-grow-1 overflow-auto pe-2 custom-scrollbar">
-                    {% if upcoming_reminders %}
-                        {% for reminder in upcoming_reminders %}
-                        <div class="d-flex align-items-center p-3 mb-3 border rounded-3 bg-white shadow-sm" style="border-left: 4px solid {% if reminder.days_left <= 3 %}var(--danger-red){% else %}var(--warning-amber){% endif %} !important;">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.95rem;">{{ reminder.title }}</h6>
-                                <div class="small text-muted"><i class="far fa-calendar-alt me-1"></i> Due: {{ reminder.due_date }}</div>
-                            </div>
-                            <div class="text-end">
-                                <div class="fw-bold mb-1 privacy-amount" data-original-amount="₱{{ reminder.amount }}" style="color: var(--text-primary);">₱{{ reminder.amount }}</div>
-                                <span class="badge rounded-pill {% if reminder.days_left <= 3 %}badge-soft-danger{% else %}icon-bg-warning{% endif %}" style="font-size: 0.75rem;">{{ reminder.days_left }} days left</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center my-auto py-4">
-                            <div class="icon-bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;"><i class="fas fa-check text-primary fa-lg"></i></div>
-                            <p class="text-muted small mb-0">No upcoming bills due right now.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="thesis-card p-4 d-flex flex-column" style="max-height: 500px; transition: all 0.3s ease;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">My Notes</h6>
-                    <button id="toggleAddNoteBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.8rem;">+ Add Note</button>
-                </div>
-
-                <div id="emptyNotesState" class="text-center text-muted m-auto py-4" style="display: none;">
-                    <i class="fas fa-sticky-note fa-2x mb-2" style="opacity: 0.2;"></i>
-                    <p class="small text-uppercase fw-bold mb-0" style="opacity: 0.4;">No notes yet</p>
-                </div>
-
-                <div id="noteInputWrapper" class="keep-note-input-container p-2 mb-3" style="display: none;">
-                    <input type="hidden" id="noteIdInput">
-                    <input type="text" id="noteTitleInput" class="form-control border-0 bg-transparent fw-bold" placeholder="Title" style="box-shadow: none; font-size: 0.95rem;">
-                    <textarea id="noteTextInput" class="form-control border-0 bg-transparent" placeholder="Take a note..." style="resize: none; box-shadow: none; font-size: 0.9rem;" rows="2"></textarea>
-                    <div class="d-flex justify-content-end mt-1 px-2 pb-1 gap-2">
-                        <button id="cancelNoteBtn" class="btn btn-sm btn-light fw-medium rounded-pill px-3" style="font-size: 0.8rem;">Cancel</button>
-                        <button id="saveNoteBtn" class="btn btn-sm text-white fw-medium rounded-pill px-3" style="background-color: var(--primary-blue); font-size: 0.8rem;">Save</button>
-                    </div>
-                </div>
-
-                <div id="notesGrid" class="d-flex flex-column gap-2 overflow-auto pe-1 flex-grow-1 custom-scrollbar">
-                    </div>
-            </div>
-
-        </div>
-
-        <div class="col-lg-7 col-xl-8 order-3 d-flex flex-column gap-4">
             <div class="thesis-card p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Recent Transactions</h6>
-                    <a href="{{ url_for('transactions.index') }}" class="btn btn-sm btn-link text-decoration-none" style="color: var(--primary-blue);">View All</a>
+                    <h6 class="fw-bold mb-0">Recent Transactions</h6>
+                    <a href="{{ url_for('transactions.index') }}" class="btn btn-sm btn-link text-decoration-none p-0">View All</a>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
                         <thead class="bg-light">
                             <tr>
                                 <th class="border-0 rounded-start">Date</th>
@@ -230,36 +288,83 @@
                             {% for t in recent_transactions %}
                             <tr>
                                 <td class="text-muted small">{{ t.date.strftime('%b %d, %Y') }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="badge {% if t.type == 'Income' %}bg-success{% else %}bg-danger{% endif %} rounded-circle p-1" style="width: 10px; height: 10px;"></div>
-                                        <span class="fw-medium">{{ t.category }}</span>
-                                    </div>
-                                </td>
+                                <td><div class="d-flex align-items-center gap-2">
+                                    <div class="badge {% if t.type == 'Income' %}bg-success{% else %}bg-danger{% endif %} rounded-circle p-1" style="width: 10px; height: 10px;"></div>
+                                    <span class="fw-medium text-dark">{{ t.category }}</span>
+                                </div></td>
                                 <td class="text-end fw-bold {% if t.type == 'Income' %}text-success{% else %}text-danger{% endif %} privacy-amount" data-original-amount="{% if t.type == 'Income' %}+{% else %}-{% endif %}₱{{ '{:,.2f}'.format(t.amount) }}">
                                     {% if t.type == 'Income' %}+{% else %}-{% endif %}₱{{ '{:,.2f}'.format(t.amount) }}
                                 </td>
                             </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-3">No transactions found.</td>
-                            </tr>
-                            {% endfor %}
+                            {% else %}<tr><td colspan="3" class="text-center text-muted py-3 small">No transactions.</td></tr>{% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </div>
 
+        <div class="col-lg-5 col-xl-4 d-flex flex-column gap-4">
+            
+            <div class="thesis-card p-4 d-flex flex-column" style="height: 350px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Upcoming Due Dates</h6>
+                    <i class="fas fa-bell text-warning"></i>
+                </div>
+                <div class="reminder-list flex-grow-1 overflow-auto pe-2 custom-scrollbar">
+                    {% if upcoming_reminders %}
+                        {% for reminder in upcoming_reminders %}
+                        <div class="d-flex align-items-center p-3 mb-3 border rounded-3 bg-white shadow-sm" style="border-left: 4px solid {% if reminder.days_left <= 3 %}var(--danger-red){% else %}var(--warning-amber){% endif %} !important;">
+                            <div class="flex-grow-1 pe-2">
+                                <h6 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2" style="font-size: 0.95rem;">
+                                    {% if reminder.is_recurring %}<i class="fas fa-sync text-purple fa-xs"></i>{% endif %}
+                                    {{ reminder.title }}
+                                </h6>
+                                <div class="small text-muted"><i class="far fa-calendar-alt me-1"></i> Due: {{ reminder.due_date }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold mb-1 privacy-amount" data-original-amount="{{ reminder.amount }}" style="color: var(--text-primary);">
+                                    {% if reminder.amount == "Amount TBD" %}TBD{% else %}{{ reminder.amount }}{% endif %}
+                                </div>
+                                <span class="badge rounded-pill {% if reminder.days_left <= 3 %}badge-soft-danger{% else %}icon-bg-warning{% endif %}" style="font-size: 0.75rem;">{{ reminder.days_left }} days left</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center my-auto py-4"><p class="text-muted small mb-0">No upcoming dues.</p></div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="thesis-card p-4 d-flex flex-column" style="max-height: 400px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0" style="color: var(--text-primary);">My Notes</h6>
+                    <button id="toggleAddNoteBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.8rem;">+ Note</button>
+                </div>
+                <div id="emptyNotesState" class="text-center text-muted m-auto py-4" style="display: none;">
+                    <p class="small text-uppercase fw-bold mb-0">No notes yet</p>
+                </div>
+                <div id="noteInputWrapper" class="keep-note-input-container p-2 mb-3" style="display: none;">
+                    <input type="hidden" id="noteIdInput">
+                    <input type="text" id="noteTitleInput" class="form-control border-0 bg-transparent fw-bold" placeholder="Title" style="box-shadow: none;">
+                    <textarea id="noteTextInput" class="form-control border-0 bg-transparent" placeholder="Take a note..." style="resize: none; box-shadow: none;" rows="2"></textarea>
+                    <div class="d-flex justify-content-end mt-1 px-2 pb-1 gap-2">
+                        <button id="cancelNoteBtn" class="btn btn-sm btn-light rounded-pill px-3">Cancel</button>
+                        <button id="saveNoteBtn" class="btn btn-sm btn-primary rounded-pill px-3">Save</button>
+                    </div>
+                </div>
+                <div id="notesGrid" class="d-flex flex-column gap-2 overflow-auto pe-1 flex-grow-1 custom-scrollbar"></div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-<!-- Add Transaction Modal -->
 <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title" id="addTransactionModalLabel">Record a Transaction</h5>
+                <h5 class="modal-title" id="addTransactionModalLabel">Record actual transaction</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2">
@@ -274,26 +379,28 @@
                             </select>
                         </div>
                         <div class="col-sm-6">
-                            <label for="txnAmount" class="form-label">Amount (₱)</label>
-                            <input type="number" id="txnAmount" step="0.01" min="0" name="amount" class="form-control" placeholder="0.00" required>
+                            <label for="txnAmount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₱</span>
+                                <input type="number" id="txnAmount" step="0.01" min="0" name="amount" class="form-control" placeholder="0.00" required>
+                            </div>
                         </div>
                     </div>
-
                     <div class="row g-3 mb-3">
                         <div class="col-sm-6">
                             <label for="txnCategory" class="form-label">Category</label>
                             <select id="txnCategory" name="category" class="form-select" required>
-                                <option value="" selected disabled>-- Select a Category --</option>
+                                <option value="" selected disabled>-- Select Category --</option>
                                 <option value="Groceries">Groceries</option>
                                 <option value="Foods">Foods</option>
                                 <option value="Rent/Mortgage">Rent/Mortgage</option>
-                                <option value="Utilities">Utilities (Electric, Water, etc.)</option>
+                                <option value="Utilities">Utilities</option>
                                 <option value="Transport">Transportation</option>
                                 <option value="Salary">Salary/Wages</option>
                                 <option value="Investments">Investments</option>
                                 <option value="Entertainment">Entertainment</option>
                                 <option value="Health">Health & Wellness</option>
-                                <option value="Electronic Devices">Electronic Devices</option>
+                                <option value=" Electronic Devices">Electronic Devices</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -302,100 +409,116 @@
                             <input type="date" id="txnDate" name="date" class="form-control" value="{{ today_date }}" required>
                         </div>
                     </div>
-
-                    <div class="mb-3" id="fundingSourceSection">
+                    
+                    <div class="mb-3" id="fundingSourceSection" style="display: none;">
                         <label for="txnDeductFrom" class="form-label">Funding Source</label>
                         <select id="txnDeductFrom" name="deduct_from" class="form-select">
-                            <option value="" selected disabled>-- Select Funding Source --</option>
-                            <option value="income">Main Income Balance</option>
-                            <option value="budget">Active Budget Allocation</option>
+                            <option value="" selected disabled>-- Select Source --</option>
+                            <option value="income">Main Balance</option>
+                            <option value="budget">Budget Allocation</option>
                         </select>
                     </div>
-
+                    
                     <div class="mb-3 p-3 bg-light rounded" id="budgetSelectContainer" style="display: none;">
-                        <label for="txnBudget" class="form-label text-primary fw-bold"><i class="fas fa-wallet me-1"></i>Select Specific Budget</label>
-                        <select id="txnBudget" name="budget_id" class="form-select border-primary shadow-sm">
-                            <option value="" disabled selected>-- Choose an Active Budget --</option>
+                        <label for="txnBudget" class="form-label text-primary fw-bold">Select specific budget</label>
+                        <select id="txnBudget" name="budget_id" class="form-select border-primary">
+                            <option value="" disabled selected>-- Choose Budget --</option>
                             {% if active_budgets %}
-                                {% for b in active_budgets %}
-                                    <option value="{{ b.id }}">
-                                        {{ b.name }} (Balance: ₱{{ b.balance | round(2) }})
-                                    </option>
-                                {% endfor %}
-                            {% else %}
-                                <option value="" disabled>No active budgets available.</option>
-                            {% endif %}
+                                {% for b in active_budgets %}<option value="{{ b.id }}">{{ b.name }} (Bal: ₱{{ b.balance | round(2) }})</option>{% endfor %}
+                            {% else %}<option value="" disabled>No active budgets.</option>{% endif %}
                         </select>
                     </div>
-
+                    
                     <div class="mb-4">
-                        <label for="txnDescription" class="form-label">Description (Optional)</label>
-                        <textarea id="txnDescription" name="description" class="form-control" rows="2" placeholder="Brief note..."></textarea>
+                        <label for="txnDescription" class="form-label">Desc (Optional)</label>
+                        <textarea id="txnDescription" name="description" class="form-control" rows="2" placeholder="Note..."></textarea>
                     </div>
-
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-custom-action w-100" id="submitBtn">Save Transaction</button>
-                    </div>
+                    <div class="d-grid mt-4"><button type="submit" class="btn btn-custom-action w-100" id="submitBtn">Save Transaction</button></div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add Plan Modal -->
 <div class="modal fade" id="addPlanModal" tabindex="-1" aria-labelledby="addPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title" id="addPlanModalLabel">Schedule a Plan</h5>
+                <h5 class="modal-title" id="addPlanModalLabel">Schedule Plan/Dues</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2">
-                <p class="mb-4 text-muted small">Adding plans helps our system forecast your future budget accurately and appears in your calendar.</p>
+                <p class="mb-4 text-muted small">Adds plans/dues to forecast and calendar.</p>
                 <form method="POST" action="{{ url_for('dashboard.add_plan') }}" id="planForm">
                     <div class="mb-3">
-                        <label for="planTitle" class="form-label">Plan Name / Event</label>
-                        <input type="text" id="planTitle" name="title" class="form-control" placeholder="e.g., Car Insurance, Bonus, Rent" required>
+                        <label for="planCategory" class="form-label">Category</label>
+                        <select id="planCategory" name="category" class="form-select" required>
+                            <option value="" selected disabled>-- Select Category --</option>
+                            <option value="Fixed Bills (Subscriptions)">Fixed Bills (Subscriptions, Rent)</option>
+                            <option value="Electric Bills">Electric Bills (Changes monthly)</option>
+                            <option value="Water Bill">Water Bill (Changes monthly)</option>
+                            <option value="Plan">Generic Plan (Inc or Exp)</option>
+                            <option value="Transaction">Generic Transaction (Inc or Exp)</option>
+                        </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="planTitle" class="form-label">Name / Identifier</label>
+                        <input type="text" id="planTitle" name="title" class="form-control" placeholder="e.g., Meralco March" required>
+                    </div>
+                    <div class="row g-3 mb-3" id="basicPlanTypeRow" style="display: none;"><div class="col-sm-6">
+                        <label for="planType" class="form-label">Type</label>
+                        <select id="planType" name="plan_type" class="form-select">
+                            <option value="" selected disabled>-- Select Type --</option>
+                            <option value="Expected Expense">Expected Expense</option>
+                            <option value="Expected Income">Expected Income</option>
+                        </select>
+                    </div></div>
                     <div class="row g-3 mb-3">
-                        <div class="col-sm-6">
-                            <label for="planType" class="form-label">Type</label>
-                            <select id="planType" name="plan_type" class="form-select" required>
-                                <option value="" selected disabled>-- Select Type --</option>
-                                <option value="Expected Expense">Expected Expense</option>
-                                <option value="Expected Income">Expected Income</option>
-                            </select>
+                        <div class="col-sm-6" id="amountInputWrapper">
+                            <label for="planAmount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₱</span>
+                                <input type="number" id="planAmount" step="0.01" min="0" name="amount" class="form-control" placeholder="0.00">
+                            </div>
                         </div>
-                        <div class="col-sm-6">
-                            <label for="planAmount" class="form-label">Amount (₱)</label>
-                            <input type="number" id="planAmount" step="0.01" min="0" name="amount" class="form-control" placeholder="0.00" required>
+                        <div class="col-sm-6" id="dateInputWrapper">
+                            <label for="planDate" class="form-label" id="dateInputLabel">Date</label>
+                            <input type="date" id="planDate" name="date" class="form-control" value="{{ today_date }}">
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label for="planDate" class="form-label">Date</label>
-                        <input type="date" id="planDate" name="date" class="form-control" value="{{ today_date }}" required>
+                    <div id="genericRecurringOption" style="display: none;"><div class="form-check mb-3 ms-1">
+                        <input class="form-check-input" type="checkbox" id="isRecurringCustom" name="is_recurring" value="yes">
+                        <label class="form-check-label text-dark fw-medium small" for="isRecurringCustom">Make recurring monthly</label>
+                    </div></div>
+                    <div class="mb-4 p-3 bg-light rounded border" id="recurringDayContainer" style="display: none;">
+                        <label for="recurringDay" class="form-label text-primary fw-bold small">Due every (date)</label>
+                        <input type="number" id="recurringDay" name="recurring_day" class="form-control border-primary" min="1" max="31" placeholder="e.g., 15">
                     </div>
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary w-100">Save Plan to Calendar</button>
-                    </div>
+                    <div class="d-grid mt-4"><button type="submit" class="btn btn-primary w-100">Schedule Plan/Dues</button></div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Event Details Modal -->
 <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title">Event Details</h5>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-bottom-0 pb-1">
+                <div class="d-flex flex-column gap-1">
+                    <h5 class="modal-title d-flex align-items-center gap-2 fw-bold" id="modalMainType"></h5>
+                    <p id="modalEventDate" class="text-secondary mb-0 small fw-medium"></p>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center pt-2 pb-4">
-                <h4 id="modalEventTitle" class="fw-bold mb-1"></h4>
-                <p id="modalEventDate" class="text-secondary mb-3 small"></p>
-                <div id="modalEventCategory" class="badge bg-light text-dark px-3 py-2 border rounded-pill small"></div>
+            <div class="modal-body pt-3 pb-4">
+                <div class="thesis-card bg-light border p-3 mb-4 rounded-3 shadow-none text-center">
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Total for Day</small>
+                    <h1 id="modalPesoTotal" class="fw-bold mb-0 mt-1 tracking-tight"></h1>
+                </div>
+                
+                <h6 class="fw-bold mb-3 mt-4 text-dark text-uppercase small tracking-wider">Itemized Breakdown:</h6>
+                <div id="modalItemizedList" class="d-flex flex-column gap-2 overflow-auto custom-scrollbar pe-1" style="max-height: 300px;"></div>
             </div>
         </div>
     </div>
@@ -409,313 +532,354 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Set today's date in the transaction form
-        const today = new Date().toISOString().split('T')[0];
+        const todayStr = new Date().toISOString().split('T')[0];
         const txnDateInput = document.getElementById('txnDate');
-        if (txnDateInput) txnDateInput.value = today;
+        if (txnDateInput) txnDateInput.value = todayStr;
+        
+        const planDateInputEl = document.getElementById('planDate');
+        if (planDateInputEl) planDateInputEl.value = todayStr;
 
-        const planDateInput = document.getElementById('planDate');
-        if (planDateInput) planDateInput.value = today;
-
-        // --- PRIVACY TOGGLE FEATURE ---
-        const privacyToggleBtn = document.getElementById('privacyToggleBtn');
-        const privacyIcon = document.getElementById('privacyIcon');
-        const amountElements = document.querySelectorAll('.privacy-amount');
-        let isPrivacyMode = localStorage.getItem('financeAppPrivacyMode') === 'true';
-
-        function updatePrivacyUI() {
-            if (isPrivacyMode) {
-                privacyIcon.classList.remove('fa-eye');
-                privacyIcon.classList.add('fa-eye-slash');
-                amountElements.forEach(el => { el.textContent = '••••••••'; });
-            } else {
-                privacyIcon.classList.remove('fa-eye-slash');
-                privacyIcon.classList.add('fa-eye');
-                amountElements.forEach(el => { el.textContent = el.getAttribute('data-original-amount'); });
-            }
-        }
-        updatePrivacyUI();
-
-        if (privacyToggleBtn) {
-            privacyToggleBtn.addEventListener('click', function() {
-                isPrivacyMode = !isPrivacyMode;
-                localStorage.setItem('financeAppPrivacyMode', isPrivacyMode);
-                updatePrivacyUI();
-            });
-        }
-
-        // --- FUNDING SOURCE TOGGLE LOGIC ---
-        const typeSelect = document.getElementById('txnType');
+        // --- Record Transaction Form Dynamic Logic ---
+        const txnType = document.getElementById('txnType');
         const fundingSourceSection = document.getElementById('fundingSourceSection');
+        const txnDeductFrom = document.getElementById('txnDeductFrom');
+        const budgetSelectContainer = document.getElementById('budgetSelectContainer');
+        const txnBudget = document.getElementById('txnBudget');
 
-        function toggleFundingSource() {
-            if (typeSelect && fundingSourceSection) {
-                if (typeSelect.value === 'Expense') {
+        if (txnType) {
+            fundingSourceSection.style.display = txnType.value === 'Expense' ? 'block' : 'none';
+            if (txnType.value !== 'Expense') {
+                budgetSelectContainer.style.display = 'none';
+            }
+
+            txnType.addEventListener('change', function() {
+                if (this.value === 'Expense') {
                     fundingSourceSection.style.display = 'block';
+                    if (txnDeductFrom.value === 'budget') {
+                        budgetSelectContainer.style.display = 'block';
+                    }
                 } else {
                     fundingSourceSection.style.display = 'none';
-                    // Also hide budget container if it was showing
-                    const budgetContainer = document.getElementById('budgetSelectContainer');
-                    if (budgetContainer) {
-                        budgetContainer.style.display = 'none';
-                    }
+                    budgetSelectContainer.style.display = 'none';
+                    txnDeductFrom.value = ''; 
+                    txnBudget.value = '';
                 }
-            }
+            });
         }
 
-        if (typeSelect) {
-            typeSelect.addEventListener('change', toggleFundingSource);
-            // Initial call to set correct visibility
-            toggleFundingSource();
-        }
-
-        // --- BUDGET DROPDOWN TOGGLE LOGIC ---
-        const deductFromSelect = document.getElementById('txnDeductFrom');
-        const budgetContainer = document.getElementById('budgetSelectContainer');
-        const budgetSelect = document.getElementById('txnBudget');
-
-        if (deductFromSelect && budgetContainer && budgetSelect) {
-            deductFromSelect.addEventListener('change', function() {
+        if (txnDeductFrom) {
+            txnDeductFrom.addEventListener('change', function() {
                 if (this.value === 'budget') {
-                    budgetContainer.style.display = 'block';
-                    budgetSelect.setAttribute('required', 'required');
+                    budgetSelectContainer.style.display = 'block';
+                    txnBudget.setAttribute('required', 'required');
                 } else {
-                    budgetContainer.style.display = 'none';
-                    budgetSelect.removeAttribute('required');
+                    budgetSelectContainer.style.display = 'none';
+                    txnBudget.removeAttribute('required');
+                    txnBudget.value = '';
                 }
             });
         }
 
-        // --- FORM VALIDATION ---
-        const transactionForm = document.getElementById('transactionForm');
-        if (transactionForm) {
-            transactionForm.addEventListener('submit', function(e) {
-                const typeSelect = document.getElementById('txnType');
-                const categorySelect = document.getElementById('txnCategory');
+        // --- FORM DYNAMIC LOGIC (Add Plan) ---
+        const planCategory = document.getElementById('planCategory');
+        const basicPlanTypeRow = document.getElementById('basicPlanTypeRow');
+        const planType = document.getElementById('planType');
+        const amountInputWrapper = document.getElementById('amountInputWrapper');
+        const planAmountInput = document.getElementById('planAmount');
+        const dateInputWrapper = document.getElementById('dateInputWrapper');
+        const genericRecurringOption = document.getElementById('genericRecurringOption');
+        const isRecurringCustom = document.getElementById('isRecurringCustom');
+        const recurringDayContainer = document.getElementById('recurringDayContainer');
+        const recurringDayInput = document.getElementById('recurringDay');
+        const dateInputLabel = document.getElementById('dateInputLabel');
 
-                if (typeSelect.value === '') {
-                    e.preventDefault();
-                    alert('Please select a transaction type');
-                    return false;
+        function resetAddPlanForm() {
+            amountInputWrapper.style.display = 'none';
+            dateInputWrapper.style.display = 'none';
+            recurringDayContainer.style.display = 'none';
+            genericRecurringOption.style.display = 'none';
+            basicPlanTypeRow.style.display = 'none';
+            
+            amountInputWrapper.style.display = 'block';
+            dateInputWrapper.style.display = 'block';
+            
+            planAmountInput.removeAttribute('required');
+            planDateInputEl.removeAttribute('required');
+            recurringDayInput.removeAttribute('required');
+            planType.removeAttribute('required');
+            
+            planAmountInput.value = ''; 
+            isRecurringCustom.checked = false;
+        }
+
+        if (planCategory) {
+            planCategory.addEventListener('change', function() {
+                resetAddPlanForm(); 
+                const cat = this.value;
+                if (cat === "Fixed Bills (Subscriptions)" || cat === "Electric Bills" || cat === "Water Bill") {
+                    
+                    // UPDATE: Completely hide the date input for recurring categories
+                    dateInputWrapper.style.display = 'none';
+                    planDateInputEl.removeAttribute('required');
+                    
+                    recurringDayContainer.style.display = 'block'; 
+                    recurringDayInput.setAttribute('required', 'required');
+                    
+                    if(cat === "Fixed Bills (Subscriptions)") {
+                        planAmountInput.setAttribute('required', 'required');
+                    } else {
+                        amountInputWrapper.style.display = 'none';
+                    }
+                } else if (cat === "Plan" || cat === "Transaction") {
+                    dateInputLabel.textContent = 'Date'; 
+                    planAmountInput.setAttribute('required', 'required');
+                    planDateInputEl.setAttribute('required', 'required'); 
+                    dateInputWrapper.style.display = 'block';
+                    basicPlanTypeRow.style.display = 'block';
+                    planType.setAttribute('required', 'required'); 
+                    genericRecurringOption.style.display = 'block';
                 }
-
-                if (categorySelect.value === '') {
-                    e.preventDefault();
-                    alert('Please select a category');
-                    return false;
+            });
+            
+            isRecurringCustom.addEventListener('change', function() {
+                if (this.checked) { 
+                    // UPDATE: Completely hide the date input when made recurring manually
+                    dateInputWrapper.style.display = 'none';
+                    planDateInputEl.removeAttribute('required');
+                    
+                    recurringDayContainer.style.display = 'block';
+                    recurringDayInput.setAttribute('required', 'required'); 
+                } else {
+                    dateInputWrapper.style.display = 'block';
+                    planDateInputEl.setAttribute('required', 'required');
+                    
+                    recurringDayContainer.style.display = 'none';
+                    recurringDayInput.removeAttribute('required');
                 }
             });
         }
 
-        const planForm = document.getElementById('planForm');
-        if (planForm) {
-            planForm.addEventListener('submit', function(e) {
-                const planTypeSelect = document.getElementById('planType');
-
-                if (planTypeSelect.value === '') {
-                    e.preventDefault();
-                    alert('Please select a plan type');
-                    return false;
-                }
-            });
-        }
-
-        // --- CALENDAR LOGIC ---
-        var calendarEl = document.getElementById('calendar');
-        var dbEvents = {{ calendar_events | safe }};
-
+        // --- CALENDAR WITH AGGREGATION & MODAL ---
+        const calendarEl = document.getElementById('calendar');
+        const dbEvents = {{ calendar_events | safe }};
         if (calendarEl) {
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: window.innerWidth < 768 ? "listWeek" : "dayGridMonth",
                 events: dbEvents,
-                headerToolbar: {
-                    left: "prev,next today",
-                    center: "title",
-                    right: "dayGridMonth,listWeek"
+                headerToolbar: { 
+                    left: "prev,next today", 
+                    center: "title", 
+                    right: "dayGridMonth,listWeek" 
                 },
                 buttonText: { dayGridMonth: 'Month', listWeek: 'List' },
                 eventDisplay: 'block',
-
-                eventClick: function(info) {
-                    document.getElementById('modalEventTitle').innerText = info.event.title;
-                    document.getElementById('modalEventCategory').innerText = info.event.extendedProps.type || 'Calendar Event';
-                    let eventDate = new Date(info.event.start);
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    document.getElementById('modalEventDate').innerText = eventDate.toLocaleDateString('en-US', options);
-                    let eventModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
-                    eventModal.show();
-                },
+                handleWindowResize: true,
+                aspectRatio: window.innerWidth < 768 ? 0.7 : 1.35,
 
                 windowResize: function(arg) {
-                    if (window.innerWidth < 768) {
-                        if (arg.view.type !== 'listWeek') calendar.changeView('listWeek');
-                    } else {
-                        if (arg.view.type === 'listWeek') calendar.changeView('dayGridMonth');
-                    }
+                    calendar.changeView(window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth');
+                    calendar.setOption('aspectRatio', window.innerWidth < 768 ? 0.7 : 1.35);
                 },
 
+                // Hover
                 eventMouseEnter: function(info) {
-                    const props = info.event.extendedProps;
-                    const isIncome = props.type === 'Income';
-
+                    const props = info.event.extendedProps, list = props.itemizedDetails;
+                    if (!list || list.length === 0) return;
+                    const isInc = props.sourceType.includes('inc');
+                    let detailsHtml = '';
+                    list.forEach(item => {
+                        const amtClass = item.amount === "Amount TBD" ? "text-muted small" : (isInc ? "text-success" : "text-danger");
+                        detailsHtml += `
+                            <div class="d-flex justify-content-between align-items-center gap-3 py-1 border-bottom border-light">
+                                <span class="text-dark fw-medium" style="font-size: 0.8rem;">${item.label}</span>
+                                <span class="fw-bold ${amtClass}" style="font-size: 0.8rem;">${item.amount}</span>
+                            </div>
+                        `;
+                    });
                     const htmlContent = `
-                        <div class="p-2" style="font-family: inherit;">
-                            <div class="badge ${isIncome ? 'bg-success' : 'bg-danger'} mb-2">${props.type}</div>
-                            <h6 class="fw-bold text-dark mb-1">${props.category}</h6>
-                            <div class="fw-bold ${isIncome ? 'text-success' : 'text-danger'} mb-2">${props.amount}</div>
-                            <small class="text-muted d-block border-top pt-1 mt-1">
-                                ${props.description}
-                            </small>
+                        <div class="p-2 custom-scrollbar" style="font-family: inherit; max-width: 280px; max-height: 250px; overflow-y:auto;">
+                            <div class="small fw-bold text-uppercase ${isInc ? 'text-success' : 'text-danger'} mb-1">${isInc ? 'Daily Income' : 'Daily Expenses'}</div>
+                            <div class="text-dark fw-bold h5 mb-3">${props.PesoTotal}</div>
+                            ${detailsHtml}
                         </div>
                     `;
-
-                    tippy(info.el, {
-                        content: htmlContent,
-                        allowHTML: true,
-                        theme: 'light-border',
-                        placement: 'top',
-                        animation: 'scale',
+                    tippy(info.el, { 
+                        content: htmlContent, 
+                        allowHTML: true, 
+                        theme: 'light-border', 
+                        placement: 'top', 
+                        animation: 'scale', 
+                        interactive: true 
                     }).show();
-                }
+                },
+
+                // Click
+                eventClick: function(info) {
+                    const props = info.event.extendedProps, list = props.itemizedDetails;
+                    if (!list || list.length === 0) return;
+                    const isInc = props.sourceType.includes('inc');
+                    
+                    const typeIcon = props.sourceType === 'recurring' ? '<i class="fas fa-sync text-purple me-1"></i>' : (isInc ? '<i class="fas fa-chart-line text-success me-1"></i>' : '<i class="fas fa-file-invoice text-danger me-1"></i>');
+                    const typeText = props.sourceType === 'recurring' ? 'Recurring Dues Breakdown' : (props.sourceType.includes('actual') ? (isInc ? 'Actual Income' : 'Actual Expenses') : (isInc ? 'Planned Income' : 'Planned Dues'));
+                    
+                    document.getElementById('modalMainType').innerHTML = `${typeIcon} ${typeText}`;
+                    document.getElementById('modalPesoTotal').innerText = props.PesoTotal;
+                    document.getElementById('modalPesoTotal').className = `fw-bold mb-0 mt-1 ${isInc ? 'text-success' : 'text-danger'}`;
+                    document.getElementById('modalEventDate').innerText = new Date(info.event.start).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                    const listContainer = document.getElementById('modalItemizedList');
+                    listContainer.innerHTML = '';
+                    list.forEach(item => {
+                        const amtClass = item.amount === "Amount TBD" ? "text-muted small" : (isInc ? "text-success" : "text-danger");
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = "d-flex justify-content-between align-items-center bg-white border p-3 rounded-3 shadow-sm";
+                        itemDiv.innerHTML = `
+                            <div>
+                                <h6 class="fw-bold mb-1 text-dark">${item.label}</h6>
+                                <p class="text-muted small mb-0">${item.desc}</p>
+                            </div>
+                            <span class="fw-bold ${amtClass}" style="font-size: 1rem;">${item.amount}</span>
+                        `;
+                        listContainer.appendChild(itemDiv);
+                    });
+                    new bootstrap.Modal(document.getElementById('eventDetailsModal')).show();
+                },
             });
             calendar.render();
         }
 
-        // --- FORECAST ---
+        // Privacy and Forecast Logic
+        const privacyToggleBtn = document.getElementById('privacyToggleBtn');
+        const privacyIcon = document.getElementById('privacyIcon');
+        const amountElements = document.querySelectorAll('.privacy-amount');
+        let isPrivacyMode = localStorage.getItem('financeAppPrivacyMode') === 'true';
+        
+        function updatePrivacyUI() {
+            privacyIcon.className = isPrivacyMode ? 'fas fa-eye-slash' : 'fas fa-eye';
+            amountElements.forEach(el => { 
+                el.textContent = isPrivacyMode ? '••••••••' : el.getAttribute('data-original-amount'); 
+            });
+        }
+        updatePrivacyUI();
+        
+        if (privacyToggleBtn) {
+            privacyToggleBtn.addEventListener('click', function() { 
+                isPrivacyMode = !isPrivacyMode; 
+                localStorage.setItem('financeAppPrivacyMode', isPrivacyMode); 
+                updatePrivacyUI(); 
+            });
+        }
+
         fetch('/reports/forecast')
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 const forecastEl = document.getElementById('forecastAmount');
                 if(forecastEl) {
-                    const formattedAmount = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(data.forecast);
-                    forecastEl.setAttribute('data-original-amount', formattedAmount);
-                    forecastEl.textContent = isPrivacyMode ? '••••••••' : formattedAmount;
+                    const fmt = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(data.forecast);
+                    forecastEl.setAttribute('data-original-amount', fmt);
+                    forecastEl.textContent = isPrivacyMode ? '••••••••' : fmt;
                 }
-            }).catch(e => console.error(e));
+            });
 
-        // --- GOOGLE KEEP STYLE NOTES ---
+        // Expanded Notes Logic
         const notesGrid = document.getElementById('notesGrid');
         const noteTitleInput = document.getElementById('noteTitleInput');
         const noteTextInput = document.getElementById('noteTextInput');
         const noteIdInput = document.getElementById('noteIdInput');
-        const saveNoteBtn = document.getElementById('saveNoteBtn');
-        const toggleAddNoteBtn = document.getElementById('toggleAddNoteBtn');
-        const cancelNoteBtn = document.getElementById('cancelNoteBtn');
         const noteInputWrapper = document.getElementById('noteInputWrapper');
+        const toggleAddNoteBtn = document.getElementById('toggleAddNoteBtn');
         const emptyNotesState = document.getElementById('emptyNotesState');
-
-        function checkEmptyState() {
-            const savedNotes = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
-            if (savedNotes.length === 0 && noteInputWrapper.style.display === 'none') {
-                emptyNotesState.style.display = 'block';
-            } else {
-                emptyNotesState.style.display = 'none';
-            }
+        
+        function checkEmptyState() { 
+            const saved = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || []; 
+            emptyNotesState.style.display = (saved.length === 0 && noteInputWrapper.style.display === 'none') ? 'block' : 'none'; 
         }
-
-        toggleAddNoteBtn.addEventListener('click', () => {
-            noteInputWrapper.style.display = 'block';
-            toggleAddNoteBtn.style.display = 'none';
-            emptyNotesState.style.display = 'none';
-            noteTextInput.focus();
+        
+        toggleAddNoteBtn.addEventListener('click', () => { 
+            noteInputWrapper.style.display = 'block'; 
+            toggleAddNoteBtn.style.display = 'none'; 
+            emptyNotesState.style.display = 'none'; 
+            noteTextInput.focus(); 
         });
-
-        cancelNoteBtn.addEventListener('click', () => {
-            noteInputWrapper.style.display = 'none';
-            toggleAddNoteBtn.style.display = 'block';
-            noteTitleInput.value = '';
-            noteTextInput.value = '';
-            noteIdInput.value = '';
-            checkEmptyState();
+        
+        document.getElementById('cancelNoteBtn').addEventListener('click', () => { 
+            noteInputWrapper.style.display = 'none'; 
+            toggleAddNoteBtn.style.display = 'block'; 
+            noteTitleInput.value = noteTextInput.value = noteIdInput.value = ''; 
+            checkEmptyState(); 
         });
-
+        
         function loadNotes() {
-            const savedNotes = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
-            notesGrid.innerHTML = '';
-
-            savedNotes.forEach(note => {
-                const noteDiv = document.createElement('div');
-                noteDiv.className = 'keep-note-card p-3 mb-1 w-100';
-
-                noteDiv.innerHTML = `
-                    <h6 class="fw-bold mb-1" style="font-size: 0.95rem; color: #333;">${note.title}</h6>
-                    <p class="mb-3" style="font-size: 0.85rem; color: #555; white-space: pre-wrap;">${note.text}</p>
-                    <div class="note-actions">
-                        <button class="btn btn-sm btn-light text-primary rounded-circle p-1 me-1 edit-note" data-id="${note.id}" title="Edit"><i class="fas fa-edit fa-xs"></i></button>
-                        <button class="btn btn-sm btn-light text-danger rounded-circle p-1 delete-note" data-id="${note.id}" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                `;
-
-                notesGrid.appendChild(noteDiv);
+            notesGrid.innerHTML = ''; 
+            const saved = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
+            saved.forEach(note => {
+                const noteCol = document.createElement('div'); 
+                noteCol.className = 'w-100'; 
+                noteCol.innerHTML = `
+                    <div class="keep-note-card p-3 note-item w-100">
+                        <h6 class="fw-bold mb-1 text-dark">${note.title || 'Untitled'}</h6>
+                        <p class="mb-3 text-secondary" style="font-size: 0.85rem; white-space: pre-wrap;">${note.text}</p>
+                        <div class="note-actions">
+                            <button class="btn btn-sm btn-light text-primary rounded-circle p-1 me-1 edit-note" data-id="${note.id}">
+                                <i class="fas fa-edit fa-xs"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light text-danger rounded-circle p-1 delete-note" data-id="${note.id}">
+                                <i class="fas fa-trash-alt fa-xs"></i>
+                            </button>
+                        </div>
+                    </div>`;
+                notesGrid.appendChild(noteCol);
             });
-
-            document.querySelectorAll('.edit-note').forEach(btn => btn.addEventListener('click', editNote));
-            document.querySelectorAll('.delete-note').forEach(btn => btn.addEventListener('click', deleteNote));
-
+            
+            document.querySelectorAll('.edit-note').forEach(btn => {
+                btn.addEventListener('click', e => { 
+                    const note = (JSON.parse(localStorage.getItem('financeAppKeepNotes')) || []).find(n => n.id === e.currentTarget.getAttribute('data-id')); 
+                    if (note) { 
+                        noteTitleInput.value = note.title; 
+                        noteTextInput.value = note.text; 
+                        noteIdInput.value = note.id; 
+                        noteInputWrapper.style.display = 'block'; 
+                        toggleAddNoteBtn.style.display = 'none'; 
+                        emptyNotesState.style.display = 'none'; 
+                        noteTextInput.focus(); 
+                    } 
+                })
+            });
+            
+            document.querySelectorAll('.delete-note').forEach(btn => {
+                btn.addEventListener('click', e => { 
+                    localStorage.setItem('financeAppKeepNotes', JSON.stringify((JSON.parse(localStorage.getItem('financeAppKeepNotes')) || []).filter(n => n.id !== e.currentTarget.getAttribute('data-id')))); 
+                    loadNotes(); 
+                })
+            });
             checkEmptyState();
         }
-
-        function saveNote() {
+        
+        document.getElementById('saveNoteBtn').addEventListener('click', () => {
             const title = noteTitleInput.value.trim();
             const text = noteTextInput.value.trim();
-            const editId = noteIdInput.value;
-
+            const editId = noteIdInput.value; 
+            
             if (!text && !title) return;
-
-            let savedNotes = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
-
-            if (editId) {
-                const noteIndex = savedNotes.findIndex(n => n.id === editId);
-                if (noteIndex > -1) {
-                    savedNotes[noteIndex].title = title;
-                    savedNotes[noteIndex].text = text;
-                }
+            
+            let saved = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
+            if (editId) { 
+                const idx = saved.findIndex(n => n.id === editId); 
+                if (idx > -1) { 
+                    saved[idx].title = title; 
+                    saved[idx].text = text; 
+                } 
             } else {
-                savedNotes.unshift({
-                    id: Date.now().toString(),
-                    title: title,
-                    text: text
-                });
+                saved.unshift({ id: Date.now().toString(), title: title, text: text });
             }
-
-            localStorage.setItem('financeAppKeepNotes', JSON.stringify(savedNotes));
-
-            noteTitleInput.value = '';
-            noteTextInput.value = '';
-            noteIdInput.value = '';
-            noteInputWrapper.style.display = 'none';
-            toggleAddNoteBtn.style.display = 'block';
-
+            
+            localStorage.setItem('financeAppKeepNotes', JSON.stringify(saved)); 
+            noteTitleInput.value = noteTextInput.value = noteIdInput.value = ''; 
+            noteInputWrapper.style.display = 'none'; 
+            toggleAddNoteBtn.style.display = 'block'; 
             loadNotes();
-        }
-
-        function editNote(e) {
-            const id = e.currentTarget.getAttribute('data-id');
-            const savedNotes = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
-            const note = savedNotes.find(n => n.id === id);
-
-            if (note) {
-                noteTitleInput.value = note.title;
-                noteTextInput.value = note.text;
-                noteIdInput.value = note.id;
-
-                noteInputWrapper.style.display = 'block';
-                toggleAddNoteBtn.style.display = 'none';
-                emptyNotesState.style.display = 'none';
-
-                noteTextInput.focus();
-            }
-        }
-
-        function deleteNote(e) {
-            const id = e.currentTarget.getAttribute('data-id');
-            let savedNotes = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
-            savedNotes = savedNotes.filter(n => n.id !== id);
-            localStorage.setItem('financeAppKeepNotes', JSON.stringify(savedNotes));
-            loadNotes();
-        }
-
-        saveNoteBtn.addEventListener('click', saveNote);
+        });
+        
         loadNotes();
     });
 </script>
