@@ -7,140 +7,40 @@
 
 <style>
     /* Google Keep Style Notes CSS */
-    .keep-note-input-container { 
-        background: #ffffff; 
-        border-radius: 8px; 
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); 
-        transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1); 
-    }
-    .keep-note-input-container:focus-within { 
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); 
-    }
-    .keep-note-card { 
-        background: #ffffff; 
-        border: 1px solid #e0e0e0; 
-        border-radius: 8px; 
-        position: relative; 
-        transition: all 0.2s ease-in-out; 
-        cursor: pointer; 
-    }
-    .keep-note-card:hover { 
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-    }
-    .note-actions { 
-        position: absolute; 
-        bottom: 8px; 
-        right: 8px; 
-        opacity: 0; 
-        transition: opacity 0.2s; 
-    }
-    .keep-note-card:hover .note-actions { 
-        opacity: 1; 
-    }
-    .note-item p { 
-        margin: 0;
-    }
+    .keep-note-input-container { background: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1); }
+    .keep-note-input-container:focus-within { box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); }
+    .keep-note-card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; position: relative; transition: all 0.2s ease-in-out; cursor: pointer; }
+    .keep-note-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .note-actions { position: absolute; bottom: 8px; right: 8px; opacity: 0; transition: opacity 0.2s; }
+    .keep-note-card:hover .note-actions { opacity: 1; }
+    .note-item p { margin: 0; }
 
     /* Calendar Styling */
-    .fc { 
-        font-size: 0.85rem; 
-    }
-    .fc-event { 
-        border: none !important; 
-        border-radius: 4px !important; 
-        margin-bottom: 2px !important; 
-    }
-    .fc-event-title { 
-        white-space: normal !important; 
-        overflow: hidden; 
-        font-weight: 700 !important; 
-        padding: 1px 4px; 
-        color: #fff; 
-    }
-    .fc-daygrid-event { 
-        cursor: pointer; 
-    }
-    .fc-theme-standard td, .fc-theme-standard th { 
-        border-color: var(--border-light); 
-    }
-    .fc .fc-button-primary { 
-        background-color: var(--primary-blue); 
-        border-color: var(--primary-blue); 
-        border-radius: 6px; 
-        text-transform: capitalize; 
-    }
-    .fc .fc-button-primary:hover { 
-        background-color: #152C6B; 
-        border-color: #152C6B; 
-    }
-    .fc .fc-toolbar-title { 
-        font-size: 1.25rem; 
-        font-weight: 700; 
-        color: var(--text-primary); 
-    }
+    .fc { font-size: 0.85rem; }
+    .fc-event { border: none !important; border-radius: 4px !important; margin-bottom: 2px !important; }
+    .fc-event-title { white-space: normal !important; overflow: hidden; font-weight: 700 !important; padding: 1px 4px; color: #fff; }
+    .fc-daygrid-event { cursor: pointer; }
+    .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
+    .fc .fc-button-primary { background-color: var(--primary-blue); border-color: var(--primary-blue); border-radius: 6px; text-transform: capitalize; }
+    .fc .fc-button-primary:hover { background-color: #152C6B; border-color: #152C6B; }
+    .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
 
     /* Guide indicator styling */
-    .legend-indicator { 
-        width: 14px; 
-        height: 14px; 
-        border-radius: 4px; 
-    }
-    .legend-text { 
-        font-size: 0.85rem; 
-        color: var(--text-secondary); 
-        font-weight: 600;
-    }
+    .legend-indicator { width: 14px; height: 14px; border-radius: 4px; }
+    .legend-text { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
 
     /* Form and Button styles */
-    .btn-custom-action { 
-        background-color: #6366F1; 
-        border-color: #6366F1; 
-        color: #fff; 
-    }
-    .btn-custom-action:hover { 
-        background-color: #4F46E5; 
-        border-color: #4F46E5; 
-        color: #fff; 
-    }
-    .btn-primary { 
-        background-color: var(--primary-blue); 
-        border-color: var(--primary-blue); 
-        color: #fff; 
-    }
-    .btn-primary:hover { 
-        background-color: #152C6B; 
-        border-color: #152C6B; 
-    }
-    .modal-content { 
-        border-radius: 12px; 
-        border: none; 
-    }
-    .modal-title { 
-        font-weight: 700; 
-        color: var(--text-primary); 
-    }
-    .form-label { 
-        font-weight: 500; 
-        font-size: 0.875rem; 
-        color: var(--text-secondary); 
-    }
-    .form-control, .form-select { 
-        border-radius: 8px; 
-        font-size: 0.875rem; 
-        padding: 10px 12px; 
-    }
-    .form-control:focus, .form-select:focus { 
-        border-color: #93C5FD; 
-        box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.2); 
-    }
-    .input-group-text { 
-        background: #F3F4F6; 
-        border: 1px solid #ced4da; 
-        border-radius: 8px 0 0 8px; 
-    }
-    .input-group .form-control { 
-        border-radius: 0 8px 8px 0; 
-    }
+    .btn-custom-action { background-color: #6366F1; border-color: #6366F1; color: #fff; }
+    .btn-custom-action:hover { background-color: #4F46E5; border-color: #4F46E5; color: #fff; }
+    .btn-primary { background-color: var(--primary-blue); border-color: var(--primary-blue); color: #fff; }
+    .btn-primary:hover { background-color: #152C6B; border-color: #152C6B; }
+    .modal-content { border-radius: 12px; border: none; }
+    .modal-title { font-weight: 700; color: var(--text-primary); }
+    .form-label { font-weight: 500; font-size: 0.875rem; color: var(--text-secondary); }
+    .form-control, .form-select { border-radius: 8px; font-size: 0.875rem; padding: 10px 12px; }
+    .form-control:focus, .form-select:focus { border-color: #93C5FD; box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.2); }
+    .input-group-text { background: #F3F4F6; border: 1px solid #ced4da; border-radius: 8px 0 0 8px; }
+    .input-group .form-control { border-radius: 0 8px 8px 0; }
 
     /* Mobile Overrides */
     @media (max-width: 576px) {
@@ -150,9 +50,7 @@
         .thesis-card { padding: 1.25rem !important; border-radius: 10px !important; }
         .kpi-card .h3 { font-size: 1.6rem !important; margin-top: 0.25rem !important;}
         .kpi-card .small { font-size: 0.7rem !important; }
-        .kpi-card .icon-bg-primary, .kpi-card .icon-bg-success, .kpi-card .icon-bg-danger, .kpi-card .icon-bg-warning { 
-            width: 42px !important; height: 42px !important; padding: 0.75rem !important;
-        }
+        .kpi-card .icon-bg-primary, .kpi-card .icon-bg-success, .kpi-card .icon-bg-danger, .kpi-card .icon-bg-warning { width: 42px !important; height: 42px !important; padding: 0.75rem !important; }
         .kpi-card i.fa-lg { font-size: 1rem !important; }
         .color-guide-card { padding: 1rem !important; margin-bottom: 1rem !important;}
         .color-guide-card .legend-text { font-size: 0.75rem !important; }
@@ -230,7 +128,6 @@
     </div>
 
     <div class="row g-4 mb-4">
-        
         <div class="col-lg-7 col-xl-8 d-flex flex-column gap-4">
             
             <div class="thesis-card p-4">
@@ -242,6 +139,9 @@
                         </button>
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPlanModal">
                             <i class="fas fa-calendar-plus me-2"></i>Schedule Plan/Dues
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#managePlansModal">
+                            Manage Plans
                         </button>
                     </div>
                 </div>
@@ -360,11 +260,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title" id="addTransactionModalLabel">Record actual transaction</h5>
+                <h5 class="modal-title">Record actual transaction</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2">
@@ -440,11 +340,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="addPlanModal" tabindex="-1" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+<div class="modal fade" id="addPlanModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title" id="addPlanModalLabel">Schedule Plan/Dues</h5>
+                <h5 class="modal-title">Schedule Plan/Dues</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2">
@@ -523,6 +423,127 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="managePlansModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h5 class="modal-title fw-bold" style="color: var(--text-primary);">Manage Scheduled Plans & Dues</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 rounded-start">Title</th>
+                                <th class="border-0">Schedule</th>
+                                <th class="border-0">Amount</th>
+                                <th class="border-0 text-end rounded-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if all_plans %}
+                                {% for plan in all_plans %}
+                                <tr>
+                                    <td class="fw-medium text-dark">{{ plan.title }}</td>
+                                    <td>
+                                        {% if plan.is_recurring %}
+                                            <span class="badge bg-soft-primary text-primary rounded-pill px-3">Every {{ plan.recurring_day }}th</span>
+                                        {% else %}
+                                            {{ plan.date.strftime('%Y-%m-%d') }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-bold privacy-amount" data-original-amount="₱{{ "{:,.2f}".format(plan.amount) }}">₱{{ "{:,.2f}".format(plan.amount) }}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2" onclick="openEditPlanModal({{ plan.id }}, '{{ plan.title | escape }}', '{{ plan.amount }}', '{{ plan.date.strftime('%Y-%m-%d') }}', '{{ plan.is_recurring }}', '{{ plan.recurring_day }}')">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="openDeleteConfirmationModal({{ plan.id }}, '{{ plan.title | escape }}')">Delete</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="4" class="text-center text-muted py-4 small">No plans scheduled. Use '+ Schedule Plan/Dues' to add one.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editPlanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h5 class="modal-title fw-bold">Edit Scheduled Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editPlanForm" method="POST">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">Name / Identifier</label>
+                        <input type="text" class="form-control" name="title" id="editPlanTitle" required>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₱</span>
+                                <input type="number" step="0.01" class="form-control" name="amount" id="editPlanAmount" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="plan_type" id="editPlanType">
+                                <option value="Expected Expense">Expense</option>
+                                <option value="Expected Income">Income</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3 ms-1">
+                        <input class="form-check-input" type="checkbox" name="is_recurring" value="yes" id="editPlanRecurring" onchange="toggleEditRecurring()">
+                        <label class="form-check-label text-dark fw-medium small" for="editPlanRecurring">Make recurring monthly</label>
+                    </div>
+
+                    <div class="mb-0" id="editPlanDateDiv">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" id="editPlanDate">
+                    </div>
+
+                    <div class="mb-0 p-3 bg-light rounded border" id="editPlanRecurringDiv" style="display:none;">
+                        <label class="form-label text-primary fw-bold small">Due every (date)</label>
+                        <input type="number" min="1" max="31" class="form-control border-primary" name="recurring_day" id="editPlanRecurringDay" placeholder="e.g., 15">
+                    </div>
+
+                </div>
+                <div class="d-grid mt-2 p-4 pt-0">
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content text-center shadow-lg" style="border-radius: 12px; border: none;">
+            <div class="modal-body p-4">
+                <h5 class="fw-bold mb-2">Delete Plan?</h5>
+                <p class="text-muted small mb-4">Are you sure you want to delete <strong id="deletePlanNameDisplay" class="text-dark"></strong> permanently?</p>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light rounded-pill flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deletePlanForm" method="POST" class="flex-grow-1">
+                        <button type="submit" class="btn btn-danger rounded-pill w-100">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -617,8 +638,6 @@
                 resetAddPlanForm(); 
                 const cat = this.value;
                 if (cat === "Fixed Bills (Subscriptions)" || cat === "Electric Bills" || cat === "Water Bill") {
-                    
-                    // UPDATE: Completely hide the date input for recurring categories
                     dateInputWrapper.style.display = 'none';
                     planDateInputEl.removeAttribute('required');
                     
@@ -643,7 +662,6 @@
             
             isRecurringCustom.addEventListener('change', function() {
                 if (this.checked) { 
-                    // UPDATE: Completely hide the date input when made recurring manually
                     dateInputWrapper.style.display = 'none';
                     planDateInputEl.removeAttribute('required');
                     
@@ -666,54 +684,15 @@
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: window.innerWidth < 768 ? "listWeek" : "dayGridMonth",
                 events: dbEvents,
-                headerToolbar: { 
-                    left: "prev,next today", 
-                    center: "title", 
-                    right: "dayGridMonth,listWeek" 
-                },
+                headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,listWeek" },
                 buttonText: { dayGridMonth: 'Month', listWeek: 'List' },
                 eventDisplay: 'block',
                 handleWindowResize: true,
                 aspectRatio: window.innerWidth < 768 ? 0.7 : 1.35,
-
                 windowResize: function(arg) {
                     calendar.changeView(window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth');
                     calendar.setOption('aspectRatio', window.innerWidth < 768 ? 0.7 : 1.35);
                 },
-
-                // Hover
-                eventMouseEnter: function(info) {
-                    const props = info.event.extendedProps, list = props.itemizedDetails;
-                    if (!list || list.length === 0) return;
-                    const isInc = props.sourceType.includes('inc');
-                    let detailsHtml = '';
-                    list.forEach(item => {
-                        const amtClass = item.amount === "Amount TBD" ? "text-muted small" : (isInc ? "text-success" : "text-danger");
-                        detailsHtml += `
-                            <div class="d-flex justify-content-between align-items-center gap-3 py-1 border-bottom border-light">
-                                <span class="text-dark fw-medium" style="font-size: 0.8rem;">${item.label}</span>
-                                <span class="fw-bold ${amtClass}" style="font-size: 0.8rem;">${item.amount}</span>
-                            </div>
-                        `;
-                    });
-                    const htmlContent = `
-                        <div class="p-2 custom-scrollbar" style="font-family: inherit; max-width: 280px; max-height: 250px; overflow-y:auto;">
-                            <div class="small fw-bold text-uppercase ${isInc ? 'text-success' : 'text-danger'} mb-1">${isInc ? 'Daily Income' : 'Daily Expenses'}</div>
-                            <div class="text-dark fw-bold h5 mb-3">${props.PesoTotal}</div>
-                            ${detailsHtml}
-                        </div>
-                    `;
-                    tippy(info.el, { 
-                        content: htmlContent, 
-                        allowHTML: true, 
-                        theme: 'light-border', 
-                        placement: 'top', 
-                        animation: 'scale', 
-                        interactive: true 
-                    }).show();
-                },
-
-                // Click
                 eventClick: function(info) {
                     const props = info.event.extendedProps, list = props.itemizedDetails;
                     if (!list || list.length === 0) return;
@@ -723,7 +702,7 @@
                     const typeText = props.sourceType === 'recurring' ? 'Recurring Dues Breakdown' : (props.sourceType.includes('actual') ? (isInc ? 'Actual Income' : 'Actual Expenses') : (isInc ? 'Planned Income' : 'Planned Dues'));
                     
                     document.getElementById('modalMainType').innerHTML = `${typeIcon} ${typeText}`;
-                    document.getElementById('modalPesoTotal').innerText = props.PesoTotal;
+                    document.getElementById('modalPesoTotal').innerText = props.PesoTotal || props.Total;
                     document.getElementById('modalPesoTotal').className = `fw-bold mb-0 mt-1 ${isInc ? 'text-success' : 'text-danger'}`;
                     document.getElementById('modalEventDate').innerText = new Date(info.event.start).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -756,9 +735,7 @@
         
         function updatePrivacyUI() {
             privacyIcon.className = isPrivacyMode ? 'fas fa-eye-slash' : 'fas fa-eye';
-            amountElements.forEach(el => { 
-                el.textContent = isPrivacyMode ? '••••••••' : el.getAttribute('data-original-amount'); 
-            });
+            amountElements.forEach(el => { el.textContent = isPrivacyMode ? '••••••••' : el.getAttribute('data-original-amount'); });
         }
         updatePrivacyUI();
         
@@ -859,28 +836,59 @@
             const title = noteTitleInput.value.trim();
             const text = noteTextInput.value.trim();
             const editId = noteIdInput.value; 
-            
             if (!text && !title) return;
-            
             let saved = JSON.parse(localStorage.getItem('financeAppKeepNotes')) || [];
             if (editId) { 
                 const idx = saved.findIndex(n => n.id === editId); 
-                if (idx > -1) { 
-                    saved[idx].title = title; 
-                    saved[idx].text = text; 
-                } 
+                if (idx > -1) { saved[idx].title = title; saved[idx].text = text; } 
             } else {
                 saved.unshift({ id: Date.now().toString(), title: title, text: text });
             }
-            
             localStorage.setItem('financeAppKeepNotes', JSON.stringify(saved)); 
             noteTitleInput.value = noteTextInput.value = noteIdInput.value = ''; 
             noteInputWrapper.style.display = 'none'; 
             toggleAddNoteBtn.style.display = 'block'; 
             loadNotes();
         });
-        
         loadNotes();
     });
+
+    // --- MANAGE PLANS LOGIC ---
+    function toggleEditRecurring() {
+        const isRecChecked = document.getElementById('editPlanRecurring').checked;
+        if(isRecChecked) {
+            document.getElementById('editPlanDateDiv').style.display = 'none';
+            document.getElementById('editPlanRecurringDiv').style.display = 'block';
+        } else {
+            document.getElementById('editPlanDateDiv').style.display = 'block';
+            document.getElementById('editPlanRecurringDiv').style.display = 'none';
+        }
+    }
+
+    function openEditPlanModal(id, title, amount, date, is_recurring, recurring_day) {
+        document.getElementById('editPlanForm').action = "/dashboard/edit_plan/" + id;
+        document.getElementById('editPlanTitle').value = title;
+        document.getElementById('editPlanAmount').value = amount;
+        
+        if (is_recurring === 'True') {
+            document.getElementById('editPlanRecurring').checked = true;
+            document.getElementById('editPlanRecurringDay').value = recurring_day !== 'None' ? recurring_day : '';
+        } else {
+            document.getElementById('editPlanRecurring').checked = false;
+            document.getElementById('editPlanDate').value = date;
+        }
+        
+        toggleEditRecurring();
+        bootstrap.Modal.getInstance(document.getElementById('managePlansModal')).hide();
+        new bootstrap.Modal(document.getElementById('editPlanModal')).show();
+    }
+
+    function openDeleteConfirmationModal(id, title) {
+        document.getElementById('deletePlanForm').action = "/dashboard/delete_plan/" + id;
+        document.getElementById('deletePlanNameDisplay').innerText = title;
+        
+        bootstrap.Modal.getInstance(document.getElementById('managePlansModal')).hide();
+        new bootstrap.Modal(document.getElementById('deleteConfirmationModal')).show();
+    }
 </script>
 {% endblock %}

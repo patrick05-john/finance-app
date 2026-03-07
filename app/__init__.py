@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for
+﻿from flask import Flask, render_template, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
@@ -44,9 +44,6 @@ def create_app():
     from .routes.debt import debt_bp
     app.register_blueprint(debt_bp)
 
-    from .routes.calendar import calendar_bp
-    app.register_blueprint(calendar_bp)
-
     from .routes.reports import reports_bp
     app.register_blueprint(reports_bp)
 
@@ -62,7 +59,7 @@ def create_app():
         # If user is already logged in, send them straight to the dashboard!
         if "user_id" in session:
             return redirect(url_for('dashboard.index'))
-        
+
         # Otherwise, show them the beautiful public landing page
         # UPDATED: Pointing to the new 'homepage' folder
         return render_template('homepage/index.html')
@@ -71,8 +68,8 @@ def create_app():
     @app.context_processor
     def inject_now():
         return {'now': datetime.datetime.now}
-	
-	    # Create database tables if they don't exist
+
+    # Create database tables if they don't exist
     with app.app_context():
         db.create_all()
         print("Database tables created/verified")

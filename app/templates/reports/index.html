@@ -1,126 +1,270 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
+{% block title %}Reports & Analytics{% endblock %}
+
 {% block content %}
+<style>
+    /* Local Card and KPI styling for Reports Page (Polished Aesthetics) */
+    .thesis-card { background: #FFFFFF; border-radius: 12px; border: 1px solid #E5E7EB; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: box-shadow 0.3s ease; }
+    .thesis-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0 fw-bold" style="color: var(--text-primary, #111827);">Financial Reports & Analytics</h3>
-        <a href="/reports/export" class="btn btn-success"><i class="fas fa-download me-2"></i>Download CSV</a>
+    .kpi-icon-container { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-size: 1.5rem; }
+
+    .bg-blue-soft { background-color: #EFF6FF; color: #1E3A8A; }
+    .bg-green-soft { background-color: #F0FDF4; color: #16A34A; }
+    .bg-red-soft { background-color: #FEF2F2; color: #DC2626; }
+    .bg-amber-soft { background-color: #FFFBEB; color: #F59E0B; }
+
+    .kpi-label { color: #6B7280; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.07em; margin-bottom: 2px; }
+    .kpi-value { color: #111827; font-size: 1.5rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
+
+    .breakdown-label { font-size: 0.85rem; font-weight: 600; color: #4B5563; }
+    .breakdown-subtext { font-size: 0.7rem; color: #9CA3AF; margin-top: 4px; display: block; }
+</style>
+
+<div class="container-fluid px-2 px-md-4 py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h3 class="mb-0 fw-bold" style="color: var(--text-primary, #111827);">Reports & Analytics</h3>
+            <p class="text-muted small mb-0 mt-1">Detailed breakdown of your financial health.</p>
+        </div>
+        <a href="/reports/export" class="btn btn-success shadow-sm" style="border-radius: 8px; padding: 10px 20px; font-weight: 500;">
+            <i class="fas fa-file-csv me-2"></i>Export CSV Report
+        </a>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0 p-3" style="border-radius: 12px;">
-                <h5 class="fw-bold mb-3">Monthly Summary</h5>
-                <canvas id="monthlyChart" style="max-height: 300px;"></canvas>
+    <div class="row g-3 g-md-4 mb-5">
+        <div class="col-sm-6 col-xl-3">
+            <div class="thesis-card p-4 h-100 d-flex align-items-center gap-3">
+                <div class="kpi-icon-container bg-blue-soft"><i class="fas fa-wallet"></i></div>
+                <div class="flex-grow-1">
+                    <div class="kpi-label">Total Balance</div>
+                    <div class="kpi-value">&#8369; {{ "{:,.2f}".format(total_balance) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="thesis-card p-4 h-100 d-flex align-items-center gap-3">
+                <div class="kpi-icon-container bg-green-soft"><i class="fas fa-piggy-bank"></i></div>
+                <div class="flex-grow-1">
+                    <div class="kpi-label">Total Savings</div>
+                    <div class="kpi-value">&#8369; {{ "{:,.2f}".format(total_savings) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="thesis-card p-4 h-100 d-flex align-items-center gap-3">
+                <div class="kpi-icon-container bg-red-soft"><i class="fas fa-credit-card"></i></div>
+                <div class="flex-grow-1">
+                    <div class="kpi-label">Total Liabilities</div>
+                    <div class="kpi-value">&#8369; {{ "{:,.2f}".format(total_debt) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="thesis-card p-4 h-100 d-flex align-items-center gap-3">
+                <div class="kpi-icon-container bg-amber-soft"><i class="fas fa-chart-line"></i></div>
+                <div class="flex-grow-1 w-100">
+                    <div class="kpi-label">Next Mo. Forecast</div>
+                    <div id="forecastValue" class="kpi-value">...</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-6 mb-4 mb-md-0">
-            <div class="card shadow-sm border-0 p-3 h-100" style="border-radius: 12px;">
-                <h5 class="fw-bold mb-3">Category Spending</h5>
-                <canvas id="categoryChart" style="max-height: 250px;"></canvas>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="thesis-card p-4 h-100">
+                <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Cash Flow Trend (Income vs Expense)</h5>
+                <div style="height: 300px; position: relative; width: 100%;">
+                    <canvas id="cashFlowChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="thesis-card p-4 h-100">
+                <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Asset Distribution</h5>
+                <div style="height: 250px; position: relative; width: 100%; display: flex; justify-content: center;">
+                    <canvas id="assetLiabilityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <div class="thesis-card p-4 h-100">
+                <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Expense Breakdown</h5>
+                <div style="height: 240px; position: relative; width: 100%; display: flex; justify-content: center;">
+                    <canvas id="expenseCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="thesis-card p-4 h-100">
+                <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Income Sources</h5>
+                <div style="height: 240px; position: relative; width: 100%; display: flex; justify-content: center;">
+                    <canvas id="incomeCategoryChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 p-4 h-100" style="border-radius: 12px; border-top: 4px solid #F59E0B !important;">
-                <h5 class="fw-bold text-muted text-uppercase small mb-2">Next Month's Forecast</h5>
-                <div id="forecastValue" class="display-6 fw-bold mb-4" style="color: #111827;">Loading...</div>
-                
-                <h6 class="text-muted text-uppercase small fw-bold border-bottom pb-2 mb-3">Forecast Breakdown</h6>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-0 bg-transparent">
-                        <div>
-                            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background-color: #F59E0B;"></span>
-                            Scheduled Bills (Fixed)
+        <div class="col-lg-4">
+            <div class="thesis-card p-4 h-100 d-flex flex-column">
+                <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Forecast Breakdown</h5>
+
+                <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="breakdown-label"><i class="fas fa-calendar-check me-2" style="color: #F59E0B;"></i>Fixed Dues</span>
+                            <span id="breakdownFixed" class="fw-bold" style="color: #111827;">...</span>
                         </div>
-                        <span id="forecastFixed" class="fw-semibold text-dark">...</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-0 bg-transparent">
-                        <div>
-                            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background-color: #3B82F6;"></span>
-                            Predicted Daily Spend (Variable)
+                        <div class="progress" style="height: 6px; background-color: #FEF3C7; border-radius: 4px;">
+                            <div class="progress-bar" role="progressbar" style="width: 100%; background-color: #F59E0B; border-radius: 4px;"></div>
                         </div>
-                        <span id="forecastVariable" class="fw-semibold text-dark">...</span>
-                    </li>
-                </ul>
+                        <span class="breakdown-subtext">Upcoming scheduled plans & recurring bills</span>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="breakdown-label"><i class="fas fa-shopping-cart me-2" style="color: #3B82F6;"></i>Variable Needs</span>
+                            <span id="breakdownVariable" class="fw-bold" style="color: #111827;">...</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background-color: #DBEAFE; border-radius: 4px;">
+                            <div class="progress-bar" role="progressbar" style="width: 100%; background-color: #3B82F6; border-radius: 4px;"></div>
+                        </div>
+                        <span class="breakdown-subtext">30-day average (Groceries, Transport, Utilities)</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+// Chart instances to prevent "Canvas is already in use" errors on reloads
+let cashFlowChart, assetLiabilityChart, expenseCategoryChart, incomeCategoryChart;
+
 async function loadReports() {
+    // Custom Peso Formatter
+    const phpFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
+
+    Chart.defaults.font.family = "'Inter', system-ui, -apple-system, sans-serif";
+    Chart.defaults.color = "#6B7280";
+    const brandColors = ['#1E3A8A', '#16A34A', '#F59E0B', '#DC2626', '#8B5CF6', '#06B6D4', '#EC4899', '#64748B'];
+
     try {
-        let summary = await fetch("/reports/summary").then(r => r.json());
-        let categories = await fetch("/reports/categories").then(r => r.json());
-        let forecast = await fetch("/reports/forecast").then(r => r.json());
+        let summary = await fetch("/reports/summary?t=" + new Date().getTime()).then(r => r.json());
+        let categories = await fetch("/reports/categories?t=" + new Date().getTime()).then(r => r.json());
+        let forecast = await fetch("/reports/forecast?t=" + new Date().getTime()).then(r => r.json());
 
-        // Monthly Chart
-        if (summary.status !== 'empty') {
-            new Chart(document.getElementById("monthlyChart"), {
-                type: "line",
-                data: {
-                    labels: Object.keys(summary.monthly),
-                    datasets: [{
-                        label: "Total Amount",
-                        data: Object.values(summary.monthly),
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        // Category Chart
-        if (categories.status !== 'empty') {
-            new Chart(document.getElementById("categoryChart"), {
-                type: "doughnut",
-                data: {
-                    labels: Object.keys(categories),
-                    datasets: [{
-                        data: Object.values(categories),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6B7280'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-            });
-        }
-
-        // Formatter for Philippine Peso
-        const phpFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
-
-        // Forecast & Breakdown
+        // 1. FORECAST KPI & BREAKDOWN
         if (forecast.forecast !== undefined) {
             document.getElementById("forecastValue").innerHTML = phpFormatter.format(forecast.forecast);
-            
+
             if (forecast.breakdown) {
-                document.getElementById("forecastFixed").innerHTML = phpFormatter.format(forecast.breakdown.fixed_plans);
-                document.getElementById("forecastVariable").innerHTML = phpFormatter.format(forecast.breakdown.predicted_variable);
-            } else {
-                // Fallback if breakdown data isn't ready yet
-                document.getElementById("forecastFixed").innerHTML = phpFormatter.format(0);
-                document.getElementById("forecastVariable").innerHTML = phpFormatter.format(0);
+                document.getElementById("breakdownFixed").innerHTML = phpFormatter.format(forecast.breakdown.fixed_plans);
+                document.getElementById("breakdownVariable").innerHTML = phpFormatter.format(forecast.breakdown.predicted_variable);
             }
         } else {
-            document.getElementById("forecastValue").innerHTML = "₱0.00";
+            // Fixed the Hidden Mojibake Bug Here!
+            document.getElementById("forecastValue").innerHTML = "&#8369;0.00";
+            document.getElementById("breakdownFixed").innerHTML = "&#8369;0.00";
+            document.getElementById("breakdownVariable").innerHTML = "&#8369;0.00";
         }
+
+        // 2. CASH FLOW TREND
+        if (summary.status !== 'empty' && summary.months) {
+            if(cashFlowChart) cashFlowChart.destroy();
+            cashFlowChart = new Chart(document.getElementById("cashFlowChart"), {
+                type: "bar",
+                data: {
+                    labels: summary.months,
+                    datasets: [
+                        { label: "Income", data: summary.income, backgroundColor: '#16A34A', borderRadius: 4 },
+                        { label: "Expense", data: summary.expense, backgroundColor: '#DC2626', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' },
+                        tooltip: { callbacks: { label: function(c) { return ' ' + phpFormatter.format(c.raw); } } }
+                    },
+                    scales: { y: { beginAtZero: true, grid: { color: '#E5E7EB' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // 3. ASSET DISTRIBUTION
+        // Safely injected Jinja floats
+        const tb = {{ total_balance | float | default(0.0) }};
+        const ts = {{ total_savings | float | default(0.0) }};
+        const td = {{ total_debt | float | default(0.0) }};
+
+        if (tb > 0 || ts > 0 || td > 0) {
+            if(assetLiabilityChart) assetLiabilityChart.destroy();
+            assetLiabilityChart = new Chart(document.getElementById("assetLiabilityChart"), {
+                type: "doughnut",
+                data: {
+                    labels: ['Main Balance', 'Savings', 'Liabilities'],
+                    datasets: [{ data: [tb, ts, td], backgroundColor: ['#1E3A8A', '#16A34A', '#DC2626'], borderWidth: 2, borderColor: '#FFFFFF' }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: function(c) { return ' ' + phpFormatter.format(c.raw); } } }
+                    }
+                }
+            });
+        }
+
+        // 4. EXPENSE CATEGORIES
+        if (categories.expense && Object.keys(categories.expense).length > 0) {
+            if(expenseCategoryChart) expenseCategoryChart.destroy();
+            expenseCategoryChart = new Chart(document.getElementById("expenseCategoryChart"), {
+                type: "doughnut",
+                data: {
+                    labels: Object.keys(categories.expense),
+                    datasets: [{ data: Object.values(categories.expense), backgroundColor: brandColors, borderWidth: 2, borderColor: '#FFFFFF' }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: function(c) { return ' ' + phpFormatter.format(c.raw); } } }
+                    }
+                }
+            });
+        }
+
+        // 5. INCOME CATEGORIES
+        if (categories.income && Object.keys(categories.income).length > 0) {
+            if(incomeCategoryChart) incomeCategoryChart.destroy();
+            incomeCategoryChart = new Chart(document.getElementById("incomeCategoryChart"), {
+                type: "doughnut",
+                data: {
+                    labels: Object.keys(categories.income),
+                    datasets: [{ data: Object.values(categories.income), backgroundColor: ['#16A34A', '#06B6D4', '#8B5CF6', '#1E3A8A'], borderWidth: 2, borderColor: '#FFFFFF' }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: function(c) { return ' ' + phpFormatter.format(c.raw); } } }
+                    }
+                }
+            });
+        }
+
     } catch (error) {
         console.error("Error loading reports:", error);
-        document.getElementById("forecastValue").innerHTML = "Error loading data";
     }
 }
 
 loadReports();
 </script>
-
 {% endblock %}

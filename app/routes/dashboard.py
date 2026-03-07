@@ -87,7 +87,7 @@ def index():
     for t in all_transactions:
         date_str = t.date.strftime('%Y-%m-%d')
         amount = float(t.amount)
-        detail = {'label': t.category, 'amount': f"₱{amount:,.2f}", 'desc': t.description or 'No desc', 'is_plan': False, 'is_recurring': False}
+        detail = {'label': t.category, 'amount': f"PHP {amount:,.2f}", 'desc': t.description or 'No desc', 'is_plan': False, 'is_recurring': False}
         if t.type == 'Income':
             daily_aggs[date_str]['actual_inc']['total'] += amount
             daily_aggs[date_str]['actual_inc']['items'].append(detail)
@@ -100,11 +100,10 @@ def index():
         amount = float(plan.amount)
         is_recurring = getattr(plan, 'is_recurring', False)
         recurring_day = getattr(plan, 'recurring_day', None)
-        amount_rem_display = f"₱{plan.amount:,.2f}" if plan.amount > 0.1 else "Amount TBD"
+        amount_rem_display = f"PHP {plan.amount:,.2f}" if plan.amount > 0.1 else "Amount TBD"
         detail = {'label': plan.title, 'amount': amount_rem_display, 'desc': 'Scheduled plan', 'is_plan': True, 'is_recurring': is_recurring}
 
         if is_recurring and recurring_day:
-            # 1. Forward-Project 12 months for Calendar
             for i in range(12):
                 fm = today.month + i
                 fy = today.year + (fm - 1) // 12
@@ -113,13 +112,11 @@ def index():
                 actual_day = min(recurring_day, max_days)
                 proj_date = date(fy, fm, actual_day)
                 
-                # Plot only if the projected date is on/after the creation month
                 if proj_date >= plan.date.replace(day=1):
                     d_str = proj_date.strftime('%Y-%m-%d')
                     daily_aggs[d_str]['recurring']['total'] += amount
                     daily_aggs[d_str]['recurring']['items'].append(detail)
 
-            # 2. Upcoming Reminders Logic (Find nearest future occurrence)
             max_days = calendar.monthrange(today.year, today.month)[1]
             actual_day = min(recurring_day, max_days)
             next_date = date(today.year, today.month, actual_day)
@@ -140,7 +137,6 @@ def index():
             })
 
         else:
-            # Standard Single Plan Processing
             date_str = plan.date.strftime('%Y-%m-%d')
             if plan.plan_type == 'Expected Income':
                 daily_aggs[date_str]['planned_inc']['total'] += amount
@@ -158,20 +154,20 @@ def index():
     calendar_events = []
     for date_str, buckets in daily_aggs.items():
         pairs = [
-            ('actual_inc', '₱ Income:', '#16A34A'),
-            ('actual_exp', '₱ Expenses:', '#DC2626'),
+            ('actual_inc', 'Income:', '#16A34A'),
+            ('actual_exp', 'Expenses:', '#DC2626'),
             ('planned_inc', 'Planned Income:', '#3B82F6'),
             ('planned_exp', 'Planned Dues:', '#F59E0B'),
-            ('recurring', '🔄 Recurring Dues:', '#8B5CF6')
+            ('recurring', 'Recurring Dues:', '#8B5CF6')
         ]
         for bucket_key, title_prefix, color in pairs:
             data = buckets[bucket_key]
             if data['total'] > 0.1 or data['items']:
                 calendar_events.append({
-                    'title': f"{title_prefix} ₱{data['total']:,.2f}",
+                    'title': f"{title_prefix} PHP {data['total']:,.2f}",
                     'start': date_str, 'color': color,
                     'extendedProps': {
-                        'sourceType': bucket_key, 'PesoTotal': f"₱{data['total']:,.2f}",
+                        'sourceType': bucket_key, 'Total': f"PHP {data['total']:,.2f}",
                         'itemizedDetails': data['items']
                     }
                 })
@@ -180,10 +176,11 @@ def index():
     recent_transactions = Transaction.query.filter(Transaction.user_id == user_id).order_by(Transaction.date.desc()).limit(5).all()
     active_budgets = get_active_budgets(user_id)
 
+    # Added all_plans parameter here to render the Manage table
     return render_template(
         "dashboard/index.html", total_balance=f"{total_balance:,.2f}", total_income=f"{total_income_sum:,.2f}", total_expenses=f"{total_expenses_sum:,.2f}",
         recent_transactions=recent_transactions, upcoming_reminders=upcoming_reminders, calendar_events=json.dumps(calendar_events),
-        active_budgets=active_budgets, today_date=today.strftime('%Y-%m-%d')
+        active_budgets=active_budgets, today_date=today.strftime('%Y-%m-%d'), all_plans=all_plans
     )
 
 @dashboard_bp.route("/add_transaction", methods=["POST"])
@@ -253,7 +250,6 @@ def add_plan():
             if is_recurring and rec_day_str:
                 rec_day = int(rec_day_str)
                 plan_data["recurring_day"] = rec_day
-                # Lock the base date strictly to the chosen recurring day
                 max_days = calendar.monthrange(base_date.year, base_date.month)[1]
                 actual_day = min(rec_day, max_days)
                 base_date = date(base_date.year, base_date.month, actual_day)
@@ -269,4 +265,56 @@ def add_plan():
     except Exception as e:
         db.session.rollback()
         flash("An error occurred while saving your plan.", "danger")
+    return redirect(url_for("dashboard.index"))
+
+@dashboard_bp.route("/delete_plan/<int:plan_id>", methods=["POST"])
+def delete_plan(plan_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    plan = Plan.query.get(plan_id)
+    if plan and plan.user_id == session["user_id"]:
+        db.session.delete(plan)
+        db.session.commit()
+        flash("Plan deleted successfully.", "success")
+    return redirect(url_for("dashboard.index"))
+
+@dashboard_bp.route("/edit_plan/<int:plan_id>", methods=["POST"])
+def edit_plan(plan_id):
+    if "user_id" not in session: return redirect(url_for("auth.login"))
+    plan = Plan.query.get(plan_id)
+    if not plan or plan.user_id != session["user_id"]:
+        return redirect(url_for("dashboard.index"))
+    
+    category = request.form.get("category")
+    raw_title = request.form.get("title")
+    amount_str = request.form.get("amount")
+    
+    is_recurring = request.form.get("is_recurring") == "yes"
+    model_plan_type = request.form.get("plan_type", "Expected Expense")
+    
+    try:
+        plan.title = raw_title
+        if hasattr(plan, 'plan_type'): plan.plan_type = model_plan_type
+        plan.amount = float(amount_str) if amount_str else 0.0
+        
+        date_str = request.form.get("date")
+        base_date = datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else date.today()
+        
+        if hasattr(plan, 'is_recurring'): plan.is_recurring = is_recurring
+        if hasattr(plan, 'recurring_day'):
+            rec_day_str = request.form.get("recurring_day")
+            if is_recurring and rec_day_str:
+                rec_day = int(rec_day_str)
+                plan.recurring_day = rec_day
+                max_days = calendar.monthrange(base_date.year, base_date.month)[1]
+                actual_day = min(rec_day, max_days)
+                base_date = date(base_date.year, base_date.month, actual_day)
+            else:
+                plan.recurring_day = None
+
+        plan.date = base_date
+        db.session.commit()
+        flash("Plan updated successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred while updating the plan.", "danger")
     return redirect(url_for("dashboard.index"))
